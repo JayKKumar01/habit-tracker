@@ -10,5 +10,5 @@ public interface UserService {
     UserDto createUser(UserRegistrationDto userRegistrationDto);
     List<UserDto> getAllUsers();
     UserDto getUserById(Long id);
-    void deleteUser(Long id);
+    boolean deleteUser(Long id);
 }

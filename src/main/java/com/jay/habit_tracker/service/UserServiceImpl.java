@@ -8,6 +8,7 @@ import com.jay.habit_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,16 +33,23 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public UserDto getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toDto)
-                .orElseThrow(() -> new RuntimeException("User with ID " + id + " not found"));
+                .orElse(null);
     }
+
 
 
     @Override
-    public void deleteUser(Long id) {
+    public boolean deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            return false;
+        }
         userRepository.deleteById(id);
+        return true;
     }
+
 }
