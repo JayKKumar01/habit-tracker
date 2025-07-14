@@ -1,6 +1,7 @@
 package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.UserDto;
+import com.jay.habit_tracker.dto.UserLoginDto;
 import com.jay.habit_tracker.dto.UserRegistrationDto;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.UserMapper;
@@ -51,5 +52,19 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
         return true;
     }
+
+    @Override
+    public UserDto loginUser(UserLoginDto userLoginDto) {
+        User user = userRepository.findByEmail(userLoginDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        // For now, we use plain text password comparison (we'll use BCrypt later)
+        if (!user.getPassword().equals(userLoginDto.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        return userMapper.toDto(user);
+    }
+
 
 }

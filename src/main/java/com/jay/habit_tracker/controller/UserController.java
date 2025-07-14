@@ -1,6 +1,7 @@
 package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.UserDto;
+import com.jay.habit_tracker.dto.UserLoginDto;
 import com.jay.habit_tracker.dto.UserRegistrationDto;
 import com.jay.habit_tracker.service.UserService;
 import jakarta.validation.Valid;
@@ -62,6 +63,18 @@ public class UserController {
         } else {
             return ResponseEntity.status(404).body(
                     Map.of("message", "User with ID " + id + " not found.")
+            );
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody UserLoginDto userLoginDto) {
+        try {
+            UserDto user = userService.loginUser(userLoginDto);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(
+                    Map.of("error", e.getMessage())
             );
         }
     }
