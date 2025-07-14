@@ -12,6 +12,6 @@ public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserById(Long id);
     UserDto getUserByEmail(String email);
-    boolean deleteUser(Long id);
+    boolean deleteUserByEmail(String email);
     UserDto loginUser(UserLoginDto userLoginDto);
 }

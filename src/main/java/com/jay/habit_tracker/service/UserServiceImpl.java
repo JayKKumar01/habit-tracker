@@ -49,9 +49,16 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
-
-
     @Override
+    public boolean deleteUserByEmail(String email) {
+        return userRepository.findByEmail(email).map(user -> {
+            userRepository.delete(user);
+            return true;
+        }).orElse(false);
+    }
+
+
+
     public boolean deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             return false;
