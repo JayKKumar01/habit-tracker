@@ -1,6 +1,7 @@
 package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.UserDto;
+import com.jay.habit_tracker.dto.UserRegistrationDto;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.UserMapper;
 import com.jay.habit_tracker.repository.UserRepository;
@@ -18,7 +19,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
         User saved = userRepository.save(user);
         return userMapper.toDto(saved);
@@ -35,8 +36,9 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("User with ID " + id + " not found"));
     }
+
 
     @Override
     public void deleteUser(Long id) {

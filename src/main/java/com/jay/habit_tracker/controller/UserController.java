@@ -1,6 +1,7 @@
 package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.UserDto;
+import com.jay.habit_tracker.dto.UserRegistrationDto;
 import com.jay.habit_tracker.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,11 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.createUser(userDto));
+    public ResponseEntity<UserDto> createUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+        UserDto createdUser = userService.createUser(userRegistrationDto);
+        return ResponseEntity
+                .status(201)
+                .body(createdUser);
     }
 
     @GetMapping
