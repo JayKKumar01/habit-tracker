@@ -42,6 +42,13 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
+    @Override
+    public UserDto getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(userMapper::toDto)
+                .orElse(null);
+    }
+
 
 
     @Override

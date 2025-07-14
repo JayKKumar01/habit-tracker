@@ -11,6 +11,7 @@ public interface UserService {
     UserDto createUser(UserRegistrationDto userRegistrationDto);
     List<UserDto> getAllUsers();
     UserDto getUserById(Long id);
+    UserDto getUserByEmail(String email);
     boolean deleteUser(Long id);
     UserDto loginUser(UserLoginDto userLoginDto);
 }

@@ -4,6 +4,8 @@ import com.jay.habit_tracker.dto.UserDto;
 import com.jay.habit_tracker.dto.UserLoginDto;
 import com.jay.habit_tracker.dto.UserRegistrationDto;
 import com.jay.habit_tracker.service.UserService;
+import com.jay.habit_tracker.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
@@ -25,19 +28,6 @@ public class UserController {
         return ResponseEntity
                 .status(201)
                 .body(createdUser);
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        List<UserDto> users = userService.getAllUsers();
-
-        if (users.isEmpty()) {
-            return ResponseEntity.ok().body(
-                    Map.of("message", "No users found.")
-            );
-        }
-
-        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
@@ -52,6 +42,33 @@ public class UserController {
 
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping
+    public ResponseEntity<?> getUsers(@RequestParam(required = false) String email,
+                                      HttpServletRequest request) {
+        if (email != null && !email.isEmpty()) {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).body(Map.of("error", "Missing or invalid Authorization header"));
+            }
+
+            String token = authHeader.substring(7);
+            String tokenEmail = jwtUtil.extractEmail(token);
+
+            if (!email.equals(tokenEmail)) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+            }
+
+            UserDto userDto = userService.getUserByEmail(email);
+            if (userDto == null) {
+                return ResponseEntity.status(404).body(Map.of("message", "User with email " + email + " not found."));
+            }
+            return ResponseEntity.ok(userDto);
+        } else {
+            return ResponseEntity.status(403).body(Map.of("error", "Access to all users is not allowed."));
+        }
+    }
+
 
 
     @DeleteMapping("/{id}")
