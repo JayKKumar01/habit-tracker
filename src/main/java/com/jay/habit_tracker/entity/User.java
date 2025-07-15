@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -34,4 +36,7 @@ public class User {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+    // ✅ OneToMany relationship with Habit
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Habit> habits = new ArrayList<>();
 }
