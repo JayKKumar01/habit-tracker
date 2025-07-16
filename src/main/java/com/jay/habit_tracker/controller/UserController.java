@@ -21,12 +21,6 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
-        UserDto createdUser = userService.createUser(userRegistrationDto);
-        return ResponseEntity.status(201).body(createdUser);
-    }
-
     @GetMapping
     public ResponseEntity<?> getUserByEmail(@RequestParam String email, HttpServletRequest request) {
         String tokenEmail = extractTokenEmail(request);
@@ -55,16 +49,6 @@ public class UserController {
         }
 
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserLoginDto userLoginDto) {
-        try {
-            UserDto user = userService.loginUser(userLoginDto);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
-        }
     }
 
     private String extractTokenEmail(HttpServletRequest request) {
