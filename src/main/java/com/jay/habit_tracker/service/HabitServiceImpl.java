@@ -50,10 +50,10 @@ public class HabitServiceImpl implements HabitService {
     }
 
     @Override
-    public boolean softDeleteHabitByIdForUser(Long habitId, String userEmail) {
+    public boolean softDeleteHabitByIdForUser(Long habitId, String userEmail, LocalDate endDate) {
         return habitRepository.findByIdAndUserEmail(habitId, userEmail)
                 .map(habit -> {
-                    habit.setEndDate(LocalDate.now());
+                    habit.setEndDate(endDate);
                     habitRepository.save(habit);
                     return true;
                 })
