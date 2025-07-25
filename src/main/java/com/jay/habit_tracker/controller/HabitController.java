@@ -70,39 +70,6 @@ public class HabitController {
         return ResponseEntity.ok(habits);
     }
 
-    // ✅ Secured version
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getHabit(@PathVariable Long id, HttpServletRequest request) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null) {
-            return ResponseEntity.status(403).body(Map.of("error", "Unauthorized"));
-        }
-
-        HabitResponse habit = habitService.getHabitByIdForUser(id, tokenEmail);
-        if (habit == null) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
-        }
-
-        return ResponseEntity.ok(habit);
-    }
-
-
-    // ✅ Delete habit (secured based on token-owner match)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHabit(@PathVariable Long id, HttpServletRequest request) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null) {
-            return ResponseEntity.status(403).body(Map.of("error", "Unauthorized"));
-        }
-
-        boolean deleted = habitService.deleteHabitForUser(id, tokenEmail);
-        if (!deleted) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
-        }
-
-        return ResponseEntity.noContent().build();
-    }
-
 
     // ✅ Extract token email like in UserController
     private String extractTokenEmail(HttpServletRequest request) {

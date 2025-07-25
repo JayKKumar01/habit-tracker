@@ -41,31 +41,12 @@ public class HabitServiceImpl implements HabitService {
                 .collect(Collectors.toList());
     }
 
-
-    @Override
-    public HabitResponse getHabitByIdForUser(Long id, String email) {
-        return habitRepository.findByIdAndUserEmail(id, email)
-                .map(habitMapper::toDto)
-                .orElse(null);
-    }
-
     @Override
     public boolean softDeleteHabitByIdForUser(Long habitId, String userEmail, LocalDate endDate) {
         return habitRepository.findByIdAndUserEmail(habitId, userEmail)
                 .map(habit -> {
                     habit.setEndDate(endDate);
                     habitRepository.save(habit);
-                    return true;
-                })
-                .orElse(false);
-    }
-
-
-    @Override
-    public boolean deleteHabitForUser(Long habitId, String userEmail) {
-        return habitRepository.findByIdAndUserEmail(habitId, userEmail)
-                .map(habit -> {
-                    habitRepository.delete(habit);
                     return true;
                 })
                 .orElse(false);

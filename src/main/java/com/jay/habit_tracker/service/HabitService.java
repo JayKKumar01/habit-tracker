@@ -9,7 +9,5 @@ import java.util.List;
 public interface HabitService {
     HabitResponse createHabit(String userEmail, HabitRequest habitRequest);
     List<HabitResponse> getHabitsByUser(String userEmail);
-    boolean deleteHabitForUser(Long id, String tokenEmail);
-    HabitResponse getHabitByIdForUser(Long id, String tokenEmail);
     boolean softDeleteHabitByIdForUser(Long id, String email, LocalDate endDate);
 }
