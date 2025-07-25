@@ -10,13 +10,14 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitResponseDTO {
+public class HabitResponse {
     private Long id;
     private String title;
     private String description;
     private Frequency frequency;
     private Set<String> targetDays; // e.g., ["MONDAY", "WEDNESDAY"]
     private LocalDate startDate;
+    private LocalDate endDate;
     private int currentStreak;
     private double completionRate;
 }

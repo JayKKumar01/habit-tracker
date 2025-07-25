@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitLogRequestDTO {
+public class HabitLogResponse {
     private LocalDate date;
     private boolean completed;
 }

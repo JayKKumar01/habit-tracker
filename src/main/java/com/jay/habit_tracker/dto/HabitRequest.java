@@ -11,7 +11,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitRequestDTO {
+public class HabitRequest {
     private String title;
     private String description;
     private Frequency frequency;

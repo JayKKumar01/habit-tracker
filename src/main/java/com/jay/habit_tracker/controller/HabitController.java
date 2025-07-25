@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.HabitRequestDTO;
-import com.jay.habit_tracker.dto.HabitResponseDTO;
+import com.jay.habit_tracker.dto.HabitRequest;
+import com.jay.habit_tracker.dto.HabitResponse;
 import com.jay.habit_tracker.service.HabitService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class HabitController {
     @PostMapping("/create/{email}")
     public ResponseEntity<?> createHabit(
             @PathVariable String email,
-            @RequestBody HabitRequestDTO requestDTO,
+            @RequestBody HabitRequest requestDTO,
             HttpServletRequest request
     ) {
         String tokenEmail = extractTokenEmail(request);
@@ -32,9 +32,29 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        HabitResponseDTO created = habitService.createHabit(email, requestDTO);
+        HabitResponse created = habitService.createHabit(email, requestDTO);
         return ResponseEntity.status(201).body(created);
     }
+
+    @PatchMapping("/soft-delete/{email}/{id}")
+    public ResponseEntity<?> softDeleteHabit(
+            @PathVariable String email,
+            @PathVariable Long id,
+            HttpServletRequest request
+    ) {
+        String tokenEmail = extractTokenEmail(request);
+        if (tokenEmail == null || !tokenEmail.equals(email)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+
+        boolean updated = habitService.softDeleteHabitByIdForUser(id, email);
+        if (!updated) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Habit marked as ended."));
+    }
+
 
     // ✅ Get user habits (secured)
     @GetMapping("/user/{email}")
@@ -44,7 +64,7 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        List<HabitResponseDTO> habits = habitService.getHabitsByUser(email);
+        List<HabitResponse> habits = habitService.getHabitsByUser(email);
         return ResponseEntity.ok(habits);
     }
 
@@ -56,7 +76,7 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Unauthorized"));
         }
 
-        HabitResponseDTO habit = habitService.getHabitByIdForUser(id, tokenEmail);
+        HabitResponse habit = habitService.getHabitByIdForUser(id, tokenEmail);
         if (habit == null) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
         }

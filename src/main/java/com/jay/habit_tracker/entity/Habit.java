@@ -39,6 +39,9 @@ public class Habit {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
+    @Column(name = "end_date")
+    private LocalDate endDate; // ✅ Soft delete field
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -46,8 +49,6 @@ public class Habit {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
-    // Relationships
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
