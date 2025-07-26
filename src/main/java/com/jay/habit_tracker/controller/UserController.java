@@ -1,12 +1,9 @@
 package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.UserDto;
-import com.jay.habit_tracker.dto.UserLoginDto;
-import com.jay.habit_tracker.dto.UserRegistrationDto;
 import com.jay.habit_tracker.service.UserService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

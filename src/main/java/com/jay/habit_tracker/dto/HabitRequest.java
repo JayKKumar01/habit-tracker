@@ -2,6 +2,8 @@ package com.jay.habit_tracker.dto;
 
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.DayOfWeek;
 import java.util.Set;

@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -43,11 +43,11 @@ public class Habit {
     private LocalDate endDate; // ✅ Soft delete field
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
     }
 
     @ManyToOne

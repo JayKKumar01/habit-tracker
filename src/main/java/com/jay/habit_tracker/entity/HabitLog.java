@@ -2,6 +2,8 @@ package com.jay.habit_tracker.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity

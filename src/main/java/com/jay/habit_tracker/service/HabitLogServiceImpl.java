@@ -47,11 +47,4 @@ public class HabitLogServiceImpl implements HabitLogService {
                 .map(habitLogMapper::toDto)
                 .collect(Collectors.toList());
     }
-
-    //@Override
-    //    public List<HabitResponse> getHabitsByUser(String userEmail) {
-    //        return habitRepository.findByUserEmail(userEmail).stream()
-    //                .map(habitMapper::toDto)
-    //                .collect(Collectors.toList());
-    //    }
 }

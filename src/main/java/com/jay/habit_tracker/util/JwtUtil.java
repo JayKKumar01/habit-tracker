@@ -6,22 +6,24 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
     private static final String SECRET_KEY = "jay_secret_key_jay_secret_key_jay_secret_key_"; // must be at least 256 bits
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
+    private static final long EXPIRATION_TIME_MILLIS = 1000 * 60 * 60 * 24; // 24 hours
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     public String generateToken(User user) {
+        Instant now = Instant.now();
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("userId", user.getId())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusMillis(EXPIRATION_TIME_MILLIS)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
