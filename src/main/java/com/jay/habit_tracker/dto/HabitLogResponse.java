@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class HabitLogResponse {
+    private Long habitId;
     private LocalDate date;
     private boolean completed;
 }

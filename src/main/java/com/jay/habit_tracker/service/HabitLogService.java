@@ -9,4 +9,6 @@ public interface HabitLogService {
     HabitLogResponse updateHabitLog(HabitLogRequest request);
 
     List<HabitLogResponse> getAllLogsForHabit(Long habitId);
+
+    List<HabitLogResponse> getAllLogsForUser(String email);
 }
