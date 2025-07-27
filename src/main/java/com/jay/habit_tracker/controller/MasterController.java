@@ -1,6 +1,4 @@
 package com.jay.habit_tracker.controller;
-
-import ch.qos.logback.classic.encoder.JsonEncoder;
 import com.jay.habit_tracker.dto.*;
 import com.jay.habit_tracker.entity.*;
 import com.jay.habit_tracker.mapper.*;
@@ -15,7 +13,6 @@ import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -130,76 +127,6 @@ public class MasterController {
 
         habitRepository.deleteAll(habits);
         return ResponseEntity.ok("Deleted " + habits.size() + " habits successfully.");
-    }
-
-    @GetMapping("/debug/db-view")
-    public ResponseEntity<String> viewAllEntitiesAsHtml() {
-        StringBuilder html = new StringBuilder();
-        html.append("<html><body>");
-
-        // Users
-        List<User> users = userRepository.findAll();
-        html.append("<h2>Users</h2><table border='1'><tr><th>ID</th><th>Name</th><th>Email</th><th>Password</th><th>Created At</th></tr>");
-        for (User u : users) {
-            html.append("<tr>")
-                    .append("<td>").append(u.getId()).append("</td>")
-                    .append("<td>").append(u.getName()).append("</td>")
-                    .append("<td>").append(u.getEmail()).append("</td>")
-                    .append("<td>").append(u.getPassword()).append("</td>")
-                    .append("<td>").append(u.getCreatedAt()).append("</td>")
-                    .append("</tr>");
-        }
-        html.append("</table><br>");
-
-        // Profiles
-        List<Profile> profiles = userRepository.findAll().stream()
-                .map(User::getProfile)
-                .filter(Objects::nonNull)
-                .toList();
-
-        html.append("<h2>Profiles</h2><table border='1'><tr><th>ID</th><th>Bio</th><th>User ID</th></tr>");
-        for (Profile p : profiles) {
-            html.append("<tr>")
-                    .append("<td>").append(p.getId()).append("</td>")
-                    .append("<td>").append(p.getBio()).append("</td>")
-                    .append("<td>").append(p.getUser().getId()).append("</td>")
-                    .append("</tr>");
-        }
-        html.append("</table><br>");
-
-        // Habits
-        List<Habit> habits = habitRepository.findAll();
-        html.append("<h2>Habits</h2><table border='1'><tr><th>ID</th><th>Title</th><th>Description</th><th>Frequency</th><th>Target Days</th><th>Start</th><th>End</th><th>User ID</th><th>Created At</th></tr>");
-        for (Habit h : habits) {
-            html.append("<tr>")
-                    .append("<td>").append(h.getId()).append("</td>")
-                    .append("<td>").append(h.getTitle()).append("</td>")
-                    .append("<td>").append(h.getDescription()).append("</td>")
-                    .append("<td>").append(h.getFrequency()).append("</td>")
-                    .append("<td>").append(h.getTargetDays()).append("</td>")
-                    .append("<td>").append(h.getStartDate()).append("</td>")
-                    .append("<td>").append(h.getEndDate()).append("</td>")
-                    .append("<td>").append(h.getUser().getId()).append("</td>")
-                    .append("<td>").append(h.getCreatedAt()).append("</td>")
-                    .append("</tr>");
-        }
-        html.append("</table><br>");
-
-        // Habit Logs
-        List<HabitLog> logs = habitLogRepository.findAll();
-        html.append("<h2>Habit Logs</h2><table border='1'><tr><th>ID</th><th>Date</th><th>Completed</th><th>Habit ID</th></tr>");
-        for (HabitLog log : logs) {
-            html.append("<tr>")
-                    .append("<td>").append(log.getId()).append("</td>")
-                    .append("<td>").append(log.getDate()).append("</td>")
-                    .append("<td>").append(log.isCompleted()).append("</td>")
-                    .append("<td>").append(log.getHabit().getId()).append("</td>")
-                    .append("</tr>");
-        }
-        html.append("</table><br>");
-
-        html.append("</body></html>");
-        return ResponseEntity.ok().header("Content-Type", "text/html").body(html.toString());
     }
 
     @GetMapping("/debug/native-view")

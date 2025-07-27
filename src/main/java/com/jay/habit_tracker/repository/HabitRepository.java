@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.repository;
 
 import com.jay.habit_tracker.entity.Habit;
-import com.jay.habit_tracker.projection.HabitProjection;
+import com.jay.habit_tracker.projection_debug.HabitProjectionDebug;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -27,7 +27,8 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
     LEFT JOIN habit_target_days htd ON h.id = htd.habit_id
     GROUP BY h.id
 """, nativeQuery = true)
-    List<HabitProjection> getAllProjectedHabits();
+    List<HabitProjectionDebug> getAllProjectedHabits();
+
 
 
 }

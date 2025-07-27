@@ -1,8 +1,8 @@
-package com.jay.habit_tracker.projection;
+package com.jay.habit_tracker.projection_debug;
 
 import java.time.LocalDate;
 
-public interface HabitLogProjection {
+public interface HabitLogProjectionDebug {
     Long getId();
     LocalDate getDate();
     boolean getCompleted();

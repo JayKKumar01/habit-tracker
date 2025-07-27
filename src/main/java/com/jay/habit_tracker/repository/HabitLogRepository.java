@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.repository;
 
 import com.jay.habit_tracker.entity.HabitLog;
-import com.jay.habit_tracker.projection.HabitLogProjection;
+import com.jay.habit_tracker.projection_debug.HabitLogProjectionDebug;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,6 +22,7 @@ public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
     List<HabitLog> findByHabitIdIn(List<Long> habitIds);
 
     @Query(value = "SELECT id, date, completed, habit_id AS habitId FROM habit_logs", nativeQuery = true)
-    List<HabitLogProjection> getAllProjectedLogs();
+    List<HabitLogProjectionDebug> getAllProjectedLogs();
+
 
 }

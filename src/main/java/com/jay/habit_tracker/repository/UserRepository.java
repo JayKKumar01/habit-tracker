@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.repository;
 
 import com.jay.habit_tracker.entity.User;
-import com.jay.habit_tracker.projection.UserProjection;
+import com.jay.habit_tracker.projection_debug.UserProjectionDebug;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,6 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByEmailNotIn(List<String> emailsToKeep);
     @Query(value = "SELECT id, name, email, password, created_at AS createdAt FROM users", nativeQuery = true)
-    List<UserProjection> getAllProjectedUsers();
+    List<UserProjectionDebug> getAllProjectedUsers();
 
 }

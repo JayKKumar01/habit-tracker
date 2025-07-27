@@ -42,6 +42,7 @@ public class HabitServiceImpl implements HabitService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public boolean editHabitByIdForUser(HabitEditRequest editRequest, String email) {
         return habitRepository.findByIdAndUserEmail(editRequest.getHabitId(), email)

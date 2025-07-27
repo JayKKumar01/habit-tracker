@@ -1,8 +1,8 @@
-package com.jay.habit_tracker.projection;
+package com.jay.habit_tracker.projection_debug;
 
 import java.time.Instant;
 
-public interface UserProjection {
+public interface UserProjectionDebug {
     Long getId();
     String getName();
     String getEmail();

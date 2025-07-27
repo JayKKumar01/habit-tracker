@@ -1,9 +1,9 @@
-package com.jay.habit_tracker.projection;
+package com.jay.habit_tracker.projection_debug;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
-public interface HabitProjection {
+public interface HabitProjectionDebug {
     Long getId();
     String getTitle();
     String getDescription();
