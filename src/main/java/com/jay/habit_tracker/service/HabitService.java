@@ -10,7 +10,7 @@ import java.util.List;
 public interface HabitService {
     HabitResponse createHabit(String userEmail, HabitRequest habitRequest);
     List<HabitResponse> getHabitsByUser(String userEmail);
-    boolean softDeleteHabitByIdForUser(Long id, String email, LocalDate endDate);
-
     boolean editHabitByIdForUser(HabitEditRequest editRequest, String email);
+
+    boolean deleteHabitByIdForUser(Long habitId, String email);
 }

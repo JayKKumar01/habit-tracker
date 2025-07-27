@@ -43,17 +43,6 @@ public class HabitServiceImpl implements HabitService {
     }
 
     @Override
-    public boolean softDeleteHabitByIdForUser(Long habitId, String userEmail, LocalDate endDate) {
-        return habitRepository.findByIdAndUserEmail(habitId, userEmail)
-                .map(habit -> {
-                    habit.setEndDate(endDate);
-                    habitRepository.save(habit);
-                    return true;
-                })
-                .orElse(false);
-    }
-
-    @Override
     public boolean editHabitByIdForUser(HabitEditRequest editRequest, String email) {
         return habitRepository.findByIdAndUserEmail(editRequest.getHabitId(), email)
                 .map(habit -> {
@@ -68,5 +57,16 @@ public class HabitServiceImpl implements HabitService {
                 })
                 .orElse(false);
     }
+
+    @Override
+    public boolean deleteHabitByIdForUser(Long habitId, String email) {
+        return habitRepository.findByIdAndUserEmail(habitId, email)
+                .map(habit -> {
+                    habitRepository.delete(habit);
+                    return true;
+                })
+                .orElse(false);
+    }
+
 
 }

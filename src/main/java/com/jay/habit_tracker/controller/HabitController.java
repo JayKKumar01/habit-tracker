@@ -1,9 +1,6 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.HabitEditRequest;
-import com.jay.habit_tracker.dto.HabitRequest;
-import com.jay.habit_tracker.dto.HabitResponse;
-import com.jay.habit_tracker.dto.HabitSoftDeleteRequest;
+import com.jay.habit_tracker.dto.*;
 import com.jay.habit_tracker.service.HabitService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,10 +54,10 @@ public class HabitController {
         return ResponseEntity.ok(Map.of("message", "Habit edited", "response", editRequest.toString()));
     }
 
-    @PutMapping("/soft-delete/{email}")
-    public ResponseEntity<?> softDeleteHabit(
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<?> deleteHabit(
             @PathVariable String email,
-            @RequestBody HabitSoftDeleteRequest deleteDto,
+            @RequestBody HabitDeleteRequest deleteRequest,
             HttpServletRequest request
     ) {
         String tokenEmail = extractTokenEmail(request);
@@ -68,14 +65,13 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        boolean updated = habitService.softDeleteHabitByIdForUser(deleteDto.getId(), email, deleteDto.getEndDate());
-        if (!updated) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
+        boolean deleted = habitService.deleteHabitByIdForUser(deleteRequest.getHabitId(), email);
+        if (!deleted) {
+            return ResponseEntity.status(404).body(Map.of("error", "Habit not found or not authorized"));
         }
 
-        return ResponseEntity.ok(Map.of("message", "Habit marked as ended.", "endDate", deleteDto.getEndDate()));
+        return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
     }
-
 
 
     // ✅ Get user habits (secured)
