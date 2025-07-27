@@ -20,6 +20,4 @@ public class HabitResponse {
     private Set<String> targetDays; // e.g., ["MONDAY", "WEDNESDAY"]
     private LocalDate startDate;
     private LocalDate endDate;
-    private int currentStreak;
-    private double completionRate;
 }

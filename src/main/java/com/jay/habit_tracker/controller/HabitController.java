@@ -2,7 +2,7 @@ package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.HabitRequest;
 import com.jay.habit_tracker.dto.HabitResponse;
-import com.jay.habit_tracker.dto.HabitSoftDeleteRequestDto;
+import com.jay.habit_tracker.dto.HabitSoftDeleteRequest;
 import com.jay.habit_tracker.service.HabitService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +40,7 @@ public class HabitController {
     @PutMapping("/soft-delete/{email}")
     public ResponseEntity<?> softDeleteHabit(
             @PathVariable String email,
-            @RequestBody HabitSoftDeleteRequestDto deleteDto,
+            @RequestBody HabitSoftDeleteRequest deleteDto,
             HttpServletRequest request
     ) {
         String tokenEmail = extractTokenEmail(request);

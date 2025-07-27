@@ -2,7 +2,7 @@ package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.AuthRequest;
 import com.jay.habit_tracker.dto.AuthResponse;
-import com.jay.habit_tracker.dto.UserRegistrationDto;
+import com.jay.habit_tracker.dto.UserRegistration;
 import com.jay.habit_tracker.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserRegistrationDto dto) {
+    public ResponseEntity<?> signup(@RequestBody UserRegistration dto) {
         return ResponseEntity.status(201).body(authService.signup(dto));
     }
 
