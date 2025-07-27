@@ -9,9 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
+import java.time.DayOfWeek;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -205,9 +210,9 @@ public class MasterController {
         html.append("<h2>Users</h2><table border='1'><tr><th>ID</th><th>Name</th><th>Email</th><th>Password</th><th>Created At</th></tr>");
         userRepository.getAllProjectedUsers().forEach(u -> html.append("<tr>")
                 .append("<td>").append(u.getId()).append("</td>")
-                .append("<td>").append(escape(u.getName())).append("</td>")
-                .append("<td>").append(escape(u.getEmail())).append("</td>")
-                .append("<td>").append(escape(u.getPassword())).append("</td>")
+                .append("<td>").append(htmlEscape(u.getName())).append("</td>")
+                .append("<td>").append(htmlEscape(u.getEmail())).append("</td>")
+                .append("<td>").append(htmlEscape(u.getPassword())).append("</td>")
                 .append("<td>").append(u.getCreatedAt()).append("</td>")
                 .append("</tr>"));
         html.append("</table><br>");
@@ -216,24 +221,28 @@ public class MasterController {
         html.append("<h2>Profiles</h2><table border='1'><tr><th>ID</th><th>Bio</th><th>User ID</th></tr>");
         profileRepository.getAllProjectedProfiles().forEach(p -> html.append("<tr>")
                 .append("<td>").append(p.getId()).append("</td>")
-                .append("<td>").append(escape(p.getBio())).append("</td>")
+                .append("<td>").append(htmlEscape(p.getBio())).append("</td>")
                 .append("<td>").append(p.getUserId()).append("</td>")
                 .append("</tr>"));
         html.append("</table><br>");
 
         // Habits
         html.append("<h2>Habits</h2><table border='1'><tr><th>ID</th><th>Title</th><th>Description</th><th>Frequency</th><th>Target Days</th><th>Start Date</th><th>End Date</th><th>Created At</th><th>User ID</th></tr>");
-        habitRepository.getAllProjectedHabits().forEach(h -> html.append("<tr>")
-                .append("<td>").append(h.getId()).append("</td>")
-                .append("<td>").append(escape(h.getTitle())).append("</td>")
-                .append("<td>").append(escape(h.getDescription())).append("</td>")
-                .append("<td>").append(escape(h.getFrequency())).append("</td>")
-                .append("<td>").append(escape(h.getTargetDays())).append("</td>")
-                .append("<td>").append(h.getStartDate()).append("</td>")
-                .append("<td>").append(h.getEndDate()).append("</td>")
-                .append("<td>").append(h.getCreatedAt()).append("</td>")
-                .append("<td>").append(h.getUserId()).append("</td>")
-                .append("</tr>"));
+        habitRepository.getAllProjectedHabits().forEach(h -> {
+            String targetDaysRaw = h.getTargetDays();
+            String convertedDays = htmlEscape(convertTargetDays(targetDaysRaw));
+            html.append("<tr>")
+                    .append("<td>").append(h.getId()).append("</td>")
+                    .append("<td>").append(htmlEscape(h.getTitle())).append("</td>")
+                    .append("<td>").append(htmlEscape(h.getDescription())).append("</td>")
+                    .append("<td>").append(htmlEscape(h.getFrequency())).append("</td>")
+                    .append("<td>").append(convertedDays).append("</td>")
+                    .append("<td>").append(h.getStartDate()).append("</td>")
+                    .append("<td>").append(h.getEndDate()).append("</td>")
+                    .append("<td>").append(h.getCreatedAt()).append("</td>")
+                    .append("<td>").append(h.getUserId()).append("</td>")
+                    .append("</tr>");
+        });
         html.append("</table><br>");
 
         // Habit Logs
@@ -250,15 +259,53 @@ public class MasterController {
         return ResponseEntity.ok().header("Content-Type", "text/html").body(html.toString());
     }
 
-    private String escape(String value) {
-        if (value == null) return "";
-        return value
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#39;");
+    private String htmlEscape(String input) {
+        return HtmlUtils.htmlEscape(input == null ? "" : input);
     }
+
+    private String convertTargetDays(String raw) {
+        if (raw == null || raw.isEmpty()) return "";
+
+        try {
+            // Clean, trim, remove blanks
+            List<String> cleaned = Arrays.stream(raw.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+
+            // Check if all parts are digits (integers)
+            boolean allNumeric = cleaned.stream().allMatch(s -> s.matches("\\d+"));
+
+            if (!allNumeric) {
+                // Maybe already day names: sort alphabetically
+                return cleaned.stream()
+                        .map(String::toUpperCase)
+                        .sorted(Comparator.comparingInt(this::dayOfWeekOrder))
+                        .collect(Collectors.joining(","));
+            }
+
+            // Convert numbers to DayOfWeek and sort them properly
+            return cleaned.stream()
+                    .map(Integer::parseInt)
+                    .map(i -> DayOfWeek.of((i % 7) + 1)) // 0=Sunday -> SUNDAY
+                    .sorted(Comparator.comparingInt(DayOfWeek::getValue)) // Monday=1, ..., Sunday=7
+                    .map(DayOfWeek::name)
+                    .collect(Collectors.joining(","));
+        } catch (Exception e) {
+            return raw;
+        }
+    }
+
+    // Helper: Natural day order
+    private int dayOfWeekOrder(String day) {
+        try {
+            return DayOfWeek.valueOf(day.toUpperCase()).getValue(); // MONDAY = 1
+        } catch (IllegalArgumentException e) {
+            return 8; // unknown goes to end
+        }
+    }
+
+
 
 
 
