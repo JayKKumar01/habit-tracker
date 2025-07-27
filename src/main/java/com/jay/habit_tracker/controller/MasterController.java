@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import java.time.DayOfWeek;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -30,6 +28,56 @@ public class MasterController {
     private final HabitMapper habitMapper;
     private final HabitLogMapper habitLogMapper;
     private final PasswordEncoder passwordEncoder;
+
+    @PutMapping("/update-target-days-bulk")
+    public ResponseEntity<String> updateTargetDaysInBulk(@RequestBody Map<Long, String> habitDayMap) {
+        Map<Integer, String> dayMap = Map.of(
+                0, "MONDAY",
+                1, "TUESDAY",
+                2, "WEDNESDAY",
+                3, "THURSDAY",
+                4, "FRIDAY",
+                5, "SATURDAY",
+                6, "SUNDAY"
+        );
+
+        for (Map.Entry<Long, String> entry : habitDayMap.entrySet()) {
+            Long habitId = entry.getKey();
+            String dayIndexes = entry.getValue();
+
+            Set<String> targetDays = Arrays.stream(dayIndexes.split(","))
+                    .map(String::trim)
+                    .map(Integer::parseInt)
+                    .sorted() // keep order Mon–Sun
+                    .map(dayMap::get)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+            Habit habit = habitRepository.findById(habitId)
+                    .orElseThrow(() -> new RuntimeException("Habit not found with id: " + habitId));
+
+            habit.setTargetDays(targetDays);
+            habitRepository.save(habit);
+        }
+
+        return ResponseEntity.ok("Target days updated successfully for " + habitDayMap.size() + " habits.");
+    }
+
+
+    @PutMapping("/habits/update-target-days")
+    public ResponseEntity<String> updateHabitTargetDays(@RequestBody HabitEditRequestTargetDays dto) {
+        Optional<Habit> optionalHabit = habitRepository.findById(dto.getHabitId());
+
+        if (optionalHabit.isEmpty()) {
+            return ResponseEntity.status(404).body("Habit with ID " + dto.getHabitId() + " not found.");
+        }
+
+        Habit habit = optionalHabit.get();
+        habit.setTargetDays(dto.getTargetDays());
+        habitRepository.save(habit);
+
+        return ResponseEntity.ok("Updated targetDays for habit ID " + dto.getHabitId());
+    }
+
 
     @PutMapping("/rehash-passwords")
     public ResponseEntity<String> rehashAllPasswords() {
@@ -157,7 +205,7 @@ public class MasterController {
         html.append("<h2>Habits</h2><table border='1'><tr><th>ID</th><th>Title</th><th>Description</th><th>Frequency</th><th>Target Days</th><th>Start Date</th><th>End Date</th><th>Created At</th><th>User ID</th></tr>");
         habitRepository.getAllProjectedHabits().forEach(h -> {
             String targetDaysRaw = h.getTargetDays();
-            String convertedDays = htmlEscape(convertTargetDays(targetDaysRaw));
+            String convertedDays = htmlEscape(targetDaysRaw);
             html.append("<tr>")
                     .append("<td>").append(h.getId()).append("</td>")
                     .append("<td>").append(htmlEscape(h.getTitle())).append("</td>")
@@ -190,47 +238,6 @@ public class MasterController {
         return HtmlUtils.htmlEscape(input == null ? "" : input);
     }
 
-    private String convertTargetDays(String raw) {
-        if (raw == null || raw.isEmpty()) return "";
-
-        try {
-            // Clean, trim, remove blanks
-            List<String> cleaned = Arrays.stream(raw.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-
-            // Check if all parts are digits (integers)
-            boolean allNumeric = cleaned.stream().allMatch(s -> s.matches("\\d+"));
-
-            if (!allNumeric) {
-                // Maybe already day names: sort alphabetically
-                return cleaned.stream()
-                        .map(String::toUpperCase)
-                        .sorted(Comparator.comparingInt(this::dayOfWeekOrder))
-                        .collect(Collectors.joining(","));
-            }
-
-            // Convert numbers to DayOfWeek and sort them properly
-            return cleaned.stream()
-                    .map(Integer::parseInt)
-                    .map(i -> DayOfWeek.of((i % 7) + 1)) // 0=Sunday -> SUNDAY
-                    .sorted(Comparator.comparingInt(DayOfWeek::getValue)) // Monday=1, ..., Sunday=7
-                    .map(DayOfWeek::name)
-                    .collect(Collectors.joining(","));
-        } catch (Exception e) {
-            return raw;
-        }
-    }
-
-    // Helper: Natural day order
-    private int dayOfWeekOrder(String day) {
-        try {
-            return DayOfWeek.valueOf(day.toUpperCase()).getValue(); // MONDAY = 1
-        } catch (IllegalArgumentException e) {
-            return 8; // unknown goes to end
-        }
-    }
 
 
 

@@ -13,21 +13,38 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
     // Finds habit by ID AND the associated user's email
     Optional<Habit> findByIdAndUserEmail(Long id, String email);
     @Query(value = """
-    SELECT\s
+    SELECT
         h.id,
         h.title,
         h.description,
         h.frequency,
-        GROUP_CONCAT(htd.day) AS targetDays,
+        GROUP_CONCAT(htds.target_day) AS targetDays,
         h.start_date AS startDate,
         h.end_date AS endDate,
         h.created_at AS createdAt,
         h.user_id AS userId
     FROM habits h
-    LEFT JOIN habit_target_days htd ON h.id = htd.habit_id
+    LEFT JOIN habit_target_day_strings htds ON h.id = htds.habit_id
     GROUP BY h.id
 """, nativeQuery = true)
     List<HabitProjectionDebug> getAllProjectedHabits();
+
+    //@Query(value = """
+    //    SELECT\s
+    //        h.id,
+    //        h.title,
+    //        h.description,
+    //        h.frequency,
+    //        GROUP_CONCAT(htd.day) AS targetDays,
+    //        h.start_date AS startDate,
+    //        h.end_date AS endDate,
+    //        h.created_at AS createdAt,
+    //        h.user_id AS userId
+    //    FROM habits h
+    //    LEFT JOIN habit_target_days htd ON h.id = htd.habit_id
+    //    GROUP BY h.id
+    //""", nativeQuery = true)
+    //    List<HabitProjectionDebug> getAllProjectedHabits();
 
 
 

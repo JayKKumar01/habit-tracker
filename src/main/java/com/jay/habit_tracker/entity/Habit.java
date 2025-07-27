@@ -32,9 +32,12 @@ public class Habit {
     private Frequency frequency;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "habit_target_days", joinColumns = @JoinColumn(name = "habit_id"))
-    @Column(name = "day")
-    private Set<DayOfWeek> targetDays;
+    @CollectionTable(
+            name = "habit_target_day_strings", // ✅ changed table name to avoid old constraint
+            joinColumns = @JoinColumn(name = "habit_id")
+    )
+    @Column(name = "target_day") // ✅ changed column name
+    private Set<String> targetDays = new HashSet<>(); // ✅ safe init
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
