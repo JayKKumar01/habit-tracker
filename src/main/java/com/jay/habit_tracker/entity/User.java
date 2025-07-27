@@ -39,4 +39,9 @@ public class User {
     // ✅ OneToMany relationship with Habit
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Habit> habits = new ArrayList<>();
+
+    // ✅ OneToOne relationship with Profile
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Profile profile;
+
 }
