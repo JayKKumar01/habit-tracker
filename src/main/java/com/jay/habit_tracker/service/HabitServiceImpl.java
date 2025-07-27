@@ -1,5 +1,6 @@
 package com.jay.habit_tracker.service;
 
+import com.jay.habit_tracker.dto.HabitEditRequest;
 import com.jay.habit_tracker.dto.HabitRequest;
 import com.jay.habit_tracker.dto.HabitResponse;
 import com.jay.habit_tracker.entity.Habit;
@@ -46,6 +47,22 @@ public class HabitServiceImpl implements HabitService {
         return habitRepository.findByIdAndUserEmail(habitId, userEmail)
                 .map(habit -> {
                     habit.setEndDate(endDate);
+                    habitRepository.save(habit);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    @Override
+    public boolean editHabitByIdForUser(HabitEditRequest editRequest, String email) {
+        return habitRepository.findByIdAndUserEmail(editRequest.getHabitId(), email)
+                .map(habit -> {
+                    habit.setTitle(editRequest.getTitle());
+                    habit.setDescription(editRequest.getDescription());
+                    LocalDate endDate = editRequest.getEndDate();
+                    if (endDate != null) {
+                        habit.setEndDate(endDate);
+                    }
                     habitRepository.save(habit);
                     return true;
                 })

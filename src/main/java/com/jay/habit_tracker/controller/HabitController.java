@@ -1,5 +1,6 @@
 package com.jay.habit_tracker.controller;
 
+import com.jay.habit_tracker.dto.HabitEditRequest;
 import com.jay.habit_tracker.dto.HabitRequest;
 import com.jay.habit_tracker.dto.HabitResponse;
 import com.jay.habit_tracker.dto.HabitSoftDeleteRequest;
@@ -35,6 +36,25 @@ public class HabitController {
 
         HabitResponse created = habitService.createHabit(email, requestDTO);
         return ResponseEntity.status(201).body(created);
+    }
+
+    @PutMapping("/edit/{email}")
+    public ResponseEntity<?> editHabit(
+            @PathVariable String email,
+            @RequestBody HabitEditRequest editRequest,
+            HttpServletRequest request
+    ) {
+        String tokenEmail = extractTokenEmail(request);
+        if (tokenEmail == null || !tokenEmail.equals(email)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+
+        boolean updated = habitService.editHabitByIdForUser(editRequest, email);
+        if (!updated) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Habit edited", "response", editRequest.toString()));
     }
 
     @PutMapping("/soft-delete/{email}")
