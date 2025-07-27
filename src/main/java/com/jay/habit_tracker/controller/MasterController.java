@@ -3,9 +3,12 @@ import com.jay.habit_tracker.dto.*;
 import com.jay.habit_tracker.entity.*;
 import com.jay.habit_tracker.mapper.*;
 import com.jay.habit_tracker.repository.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
@@ -28,6 +31,23 @@ public class MasterController {
     private final HabitMapper habitMapper;
     private final HabitLogMapper habitLogMapper;
     private final PasswordEncoder passwordEncoder;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @DeleteMapping("/drop-old-target-days-table")
+    @Transactional
+    public ResponseEntity<String> dropOldTargetDaysTable() {
+        try {
+            entityManager
+                    .createNativeQuery("DROP TABLE IF EXISTS habit_target_days")
+                    .executeUpdate();
+
+            return ResponseEntity.ok("Old table 'habit_target_days' dropped successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error dropping table: " + e.getMessage());
+        }
+    }
 
     @PutMapping("/update-target-days-bulk")
     public ResponseEntity<String> updateTargetDaysInBulk(@RequestBody Map<Long, String> habitDayMap) {
