@@ -1,15 +1,12 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.HabitEditRequest;
-import com.jay.habit_tracker.dto.HabitRequest;
-import com.jay.habit_tracker.dto.HabitResponse;
-import com.jay.habit_tracker.dto.HabitWithLogsResponse;
+import com.jay.habit_tracker.dto.*;
 
 import java.util.List;
 
 public interface HabitService {
     HabitResponse createHabit(Long userId, HabitRequest habitRequest);
-    HabitResponse editHabit(HabitEditRequest editRequest);
+    HabitEditResponse editHabit(HabitEditRequest editRequest);
     List<HabitWithLogsResponse> getHabitWithLogsByUserId(Long userId);
     boolean deleteHabit(Long habitId);
 

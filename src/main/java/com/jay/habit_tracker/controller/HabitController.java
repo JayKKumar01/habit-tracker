@@ -40,7 +40,7 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        HabitResponse updated = habitService.editHabit(editRequest);
+        HabitEditResponse updated = habitService.editHabit(editRequest);
         return ResponseEntity.ok(updated); // 200 OK for updates
     }
 
@@ -57,14 +57,10 @@ public class HabitController {
         return ResponseEntity.ok(habits);
     }
 
-    @DeleteMapping("/delete/{email}")
-    public ResponseEntity<?> deleteHabit(
-            @PathVariable String email,
-            @RequestBody HabitDeleteRequest deleteRequest,
-            HttpServletRequest request
-    ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<?> deleteHabit(@PathVariable Long userId, @RequestBody HabitDeleteRequest deleteRequest, HttpServletRequest request) {
+        Long tokenUserId = extractTokenUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
@@ -75,6 +71,7 @@ public class HabitController {
 
         return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
     }
+
 
     // ✅ Extract token email like in UserController
     private String extractTokenEmail(HttpServletRequest request) {

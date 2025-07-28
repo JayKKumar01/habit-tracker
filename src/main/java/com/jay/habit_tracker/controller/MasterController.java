@@ -6,6 +6,7 @@ import com.jay.habit_tracker.mapper.*;
 import com.jay.habit_tracker.repository.*;
 import com.jay.habit_tracker.service.HabitService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,18 @@ public class MasterController {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @DeleteMapping("/deleteHabit/{habitId}")
+    public ResponseEntity<?> deleteHabitWithoutAuth(@PathVariable Long habitId) {
+        try {
+            Habit habitRef = entityManager.getReference(Habit.class, habitId);
+            habitRepository.delete(habitRef);
+            return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", habitId));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body(Map.of("error", "Habit not found", "habitId", habitId));
+        }
+    }
+
+
 
     @PostMapping("/createHabit/{userId}/{count}")
     public ResponseEntity<List<HabitResponse>> createHabitWithoutAuth(
@@ -70,7 +83,7 @@ public class MasterController {
     }
 
     @PostMapping("/editHabit/{habitId}")
-    public ResponseEntity<HabitResponse> editHabitWithoutAuth(
+    public ResponseEntity<?> editHabitWithoutAuth(
             @PathVariable Long habitId,
             @RequestParam(required = false) String endDateStr) {
 
@@ -85,7 +98,7 @@ public class MasterController {
             editRequest.setEndDate(LocalDate.parse(endDateStr));
         }
 
-        HabitResponse updatedHabit = habitService.editHabit(editRequest);
+        HabitEditResponse updatedHabit = habitService.editHabit(editRequest);
         return ResponseEntity.ok(updatedHabit);
     }
 

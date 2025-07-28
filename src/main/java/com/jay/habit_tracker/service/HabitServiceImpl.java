@@ -1,18 +1,16 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.HabitEditRequest;
-import com.jay.habit_tracker.dto.HabitRequest;
-import com.jay.habit_tracker.dto.HabitResponse;
-import com.jay.habit_tracker.dto.HabitWithLogsResponse;
+import com.jay.habit_tracker.dto.*;
 import com.jay.habit_tracker.entity.Habit;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.HabitMapper;
 import com.jay.habit_tracker.repository.HabitCustomRepository;
 import com.jay.habit_tracker.repository.HabitRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -39,19 +37,32 @@ public class HabitServiceImpl implements HabitService {
 
 
     @Override
-    public HabitResponse editHabit(HabitEditRequest editRequest) {
-        Habit habit = habitRepository.findById(editRequest.getHabitId())
-                .orElseThrow(() -> new EntityNotFoundException("Habit not found with id: " + editRequest.getHabitId()));
+    @Transactional
+    public HabitEditResponse editHabit(HabitEditRequest editRequest) {
+        StringBuilder sql = new StringBuilder("UPDATE habits SET title = :title, description = :description");
 
-        habit.setTitle(editRequest.getTitle());
-        habit.setDescription(editRequest.getDescription());
         if (editRequest.getEndDate() != null) {
-            habit.setEndDate(editRequest.getEndDate());
+            sql.append(", end_date = :endDate");
         }
 
-        Habit savedHabit = habitRepository.save(habit);
-        return habitMapper.toDto(savedHabit);
+        sql.append(" WHERE id = :habitId");
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("title", editRequest.getTitle());
+        query.setParameter("description", editRequest.getDescription());
+        query.setParameter("habitId", editRequest.getHabitId());
+
+        if (editRequest.getEndDate() != null) {
+            query.setParameter("endDate", editRequest.getEndDate());
+        }
+
+        query.executeUpdate();
+
+        return habitMapper.toEditResponse(editRequest); // ⚠️ Ensure mapper doesn't trigger user.getName() etc.
     }
+
+
+
 
 
 
@@ -69,6 +80,8 @@ public class HabitServiceImpl implements HabitService {
                 })
                 .orElse(false);
     }
+
+
 
 
 

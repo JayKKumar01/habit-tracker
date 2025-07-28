@@ -12,11 +12,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitResponse {
-    private Long id;
+public class HabitEditResponse {
+    private Long habitId;
     private String title;
     private String description;
-    private Frequency frequency;
-    private Set<DayOfWeek> targetDays; // e.g., ["MONDAY", "WEDNESDAY"]
-    private LocalDate startDate;
+    private LocalDate endDate;
 }
