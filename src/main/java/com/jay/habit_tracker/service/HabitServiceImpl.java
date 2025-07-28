@@ -6,6 +6,7 @@ import com.jay.habit_tracker.dto.HabitResponse;
 import com.jay.habit_tracker.entity.Habit;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.HabitMapper;
+import com.jay.habit_tracker.repository.HabitCustomRepository;
 import com.jay.habit_tracker.repository.HabitRepository;
 import com.jay.habit_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class HabitServiceImpl implements HabitService {
     private final HabitRepository habitRepository;
     private final UserRepository userRepository;
     private final HabitMapper habitMapper;
+    private final HabitCustomRepository habitCustomRepository;
 
     @Override
     public HabitResponse createHabit(String userEmail, HabitRequest habitRequest) {
@@ -34,6 +36,15 @@ public class HabitServiceImpl implements HabitService {
         Habit savedHabit = habitRepository.save(habit);
         return habitMapper.toDto(savedHabit);
     }
+
+    @Override
+    public List<HabitResponse> getHabitsByUserId(Long userId) {
+        return habitCustomRepository.findHabitResponsesByUserId(userId);
+//        return habitRepository.findByUserId(userId).stream()
+//                .map(habitMapper::toDto)
+//                .collect(Collectors.toList());
+    }
+
 
     @Override
     public List<HabitResponse> getHabitsByUser(String userEmail) {

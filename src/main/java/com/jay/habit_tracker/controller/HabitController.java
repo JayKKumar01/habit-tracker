@@ -75,7 +75,7 @@ public class HabitController {
 
 
     // ✅ Get user habits (secured)
-    @GetMapping("/user/{email}")
+    @GetMapping("/user-email/{email}")
     public ResponseEntity<?> getUserHabits(@PathVariable String email, HttpServletRequest request) {
         String tokenEmail = extractTokenEmail(request);
         if (tokenEmail == null || !tokenEmail.equals(email)) {
@@ -86,6 +86,18 @@ public class HabitController {
         return ResponseEntity.ok(habits);
     }
 
+    @GetMapping("/user-id/{userId}")
+    public ResponseEntity<?> getUserHabitsById(@PathVariable Long userId, HttpServletRequest request) {
+        Long tokenUserId = extractTokenUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+
+        List<HabitResponse> habits = habitService.getHabitsByUserId(userId);
+        return ResponseEntity.ok(habits);
+    }
+
+
 
     // ✅ Extract token email like in UserController
     private String extractTokenEmail(HttpServletRequest request) {
@@ -95,5 +107,15 @@ public class HabitController {
         }
         String token = authHeader.substring(7);
         return jwtUtil.extractEmail(token);
+    }
+
+    // ✅ Extract token email like in UserController
+    private Long extractTokenUserId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        String token = authHeader.substring(7);
+        return jwtUtil.extractUserId(token);
     }
 }
