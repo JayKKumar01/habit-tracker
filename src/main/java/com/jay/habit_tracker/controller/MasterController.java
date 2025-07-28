@@ -7,6 +7,7 @@ import com.jay.habit_tracker.repository.*;
 import com.jay.habit_tracker.service.HabitService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +41,7 @@ public class MasterController {
     @PersistenceContext
     private EntityManager entityManager;
 
+
     @PostMapping("/createHabit/{userId}/{count}")
     public ResponseEntity<List<HabitResponse>> createHabitWithoutAuth(
             @PathVariable Long userId,
@@ -66,6 +68,28 @@ public class MasterController {
 
         return ResponseEntity.status(201).body(createdHabits);
     }
+
+    @PostMapping("/editHabit/{habitId}")
+    public ResponseEntity<HabitResponse> editHabitWithoutAuth(
+            @PathVariable Long habitId,
+            @RequestParam(required = false) String endDateStr) {
+
+        System.out.println("Editing Habit ID: " + habitId);
+
+        HabitEditRequest editRequest = new HabitEditRequest();
+        editRequest.setHabitId(habitId);
+        editRequest.setTitle("Updated Title " + habitId);
+        editRequest.setDescription("Updated Description for Habit " + habitId);
+
+        if (endDateStr != null && !endDateStr.isBlank()) {
+            editRequest.setEndDate(LocalDate.parse(endDateStr));
+        }
+
+        HabitResponse updatedHabit = habitService.editHabit(editRequest);
+        return ResponseEntity.ok(updatedHabit);
+    }
+
+
 
 
 

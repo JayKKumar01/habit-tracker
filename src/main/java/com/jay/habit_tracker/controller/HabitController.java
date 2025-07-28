@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/habits")
@@ -31,24 +32,19 @@ public class HabitController {
         return ResponseEntity.status(201).body(created);
     }
 
-    @PutMapping("/edit/{email}")
-    public ResponseEntity<?> editHabit(
-            @PathVariable String email,
-            @RequestBody HabitEditRequest editRequest,
-            HttpServletRequest request
-    ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
+    // ✅ Edit habit (secured)
+    @PutMapping("/edit/{userId}")
+    public ResponseEntity<?> editHabit(@PathVariable Long userId, @RequestBody HabitEditRequest editRequest, HttpServletRequest request) {
+        Long tokenUserId = extractTokenUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        boolean updated = habitService.editHabit(editRequest);
-        if (!updated) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
-        }
-
-        return ResponseEntity.ok(Map.of("message", "Habit edited", "response", editRequest.toString()));
+        HabitResponse updated = habitService.editHabit(editRequest);
+        return ResponseEntity.ok(updated); // 200 OK for updates
     }
+
+
 
     @GetMapping("/habitsAndLogs/{userId}")
     public ResponseEntity<?> getHabitWithLogsByUserId(@PathVariable Long userId, HttpServletRequest request) {

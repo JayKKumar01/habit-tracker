@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface HabitService {
     HabitResponse createHabit(Long userId, HabitRequest habitRequest);
-    boolean editHabit(HabitEditRequest editRequest);
+    HabitResponse editHabit(HabitEditRequest editRequest);
     List<HabitWithLogsResponse> getHabitWithLogsByUserId(Long userId);
     boolean deleteHabit(Long habitId);
 
