@@ -44,15 +44,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String email = jwtUtil.extractEmail(token);
 
-        // Check if user exists and set authentication
-        userRepository.findByEmail(email).ifPresent(user -> {
-            var authToken = new UsernamePasswordAuthenticationToken(
-                    user, null, null  // We are not setting roles for now, can add later
-            );
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        });
+        // ✅ No DB call; directly authenticate based on email from JWT
+        var authToken = new UsernamePasswordAuthenticationToken(
+                email, null, null // No roles yet, so authorities = null
+        );
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
     }
+
 }

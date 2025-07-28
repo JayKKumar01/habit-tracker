@@ -10,6 +10,7 @@ import com.jay.habit_tracker.mapper.HabitMapper;
 import com.jay.habit_tracker.repository.HabitCustomRepository;
 import com.jay.habit_tracker.repository.HabitRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,17 +40,19 @@ public class HabitServiceImpl implements HabitService {
 
     @Override
     public HabitResponse editHabit(HabitEditRequest editRequest) {
-        Habit habitRef = entityManager.getReference(Habit.class, editRequest.getHabitId());
+        Habit habit = habitRepository.findById(editRequest.getHabitId())
+                .orElseThrow(() -> new EntityNotFoundException("Habit not found with id: " + editRequest.getHabitId()));
 
-        habitRef.setTitle(editRequest.getTitle());
-        habitRef.setDescription(editRequest.getDescription());
+        habit.setTitle(editRequest.getTitle());
+        habit.setDescription(editRequest.getDescription());
         if (editRequest.getEndDate() != null) {
-            habitRef.setEndDate(editRequest.getEndDate());
+            habit.setEndDate(editRequest.getEndDate());
         }
 
-        Habit savedHabit = habitRepository.save(habitRef);
+        Habit savedHabit = habitRepository.save(habit);
         return habitMapper.toDto(savedHabit);
     }
+
 
 
     @Override
