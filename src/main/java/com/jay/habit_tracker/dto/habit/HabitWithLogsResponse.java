@@ -1,6 +1,6 @@
 package com.jay.habit_tracker.dto.habit;
 
-import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
+import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
 
@@ -24,5 +24,5 @@ public class HabitWithLogsResponse {
     private LocalDate endDate;
     
     // ✅ List of associated log entries
-    private List<HabitLogResponse> logs;
+    private List<HabitLogUpdateDto> logs;
 }

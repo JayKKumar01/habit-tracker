@@ -7,7 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProfileResponse {
-    private String email;
+public class ProfileUpdateDto {
     private String bio;
 }

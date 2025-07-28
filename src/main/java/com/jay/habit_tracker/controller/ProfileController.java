@@ -1,7 +1,6 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.profile.ProfileRequest;
-import com.jay.habit_tracker.dto.profile.ProfileResponse;
+import com.jay.habit_tracker.dto.profile.ProfileUpdateDto;
 import com.jay.habit_tracker.service.ProfileService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public class ProfileController {
     @PostMapping("/save/{userId}")
     public ResponseEntity<?> saveOrUpdateProfile(
             @PathVariable Long userId,
-            @RequestBody ProfileRequest profileRequest,
+            @RequestBody ProfileUpdateDto profileUpdateDto,
             HttpServletRequest request
     ) {
         Long tokenUserId = jwtUtil.extractUserId(request);
@@ -30,7 +29,7 @@ public class ProfileController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        ProfileResponse response = profileService.saveOrUpdate(userId, profileRequest);
+        ProfileUpdateDto response = profileService.saveOrUpdate(userId, profileUpdateDto);
         return ResponseEntity.ok(response);
     }
 
@@ -45,7 +44,7 @@ public class ProfileController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        ProfileResponse response = profileService.getProfile(userId);
+        ProfileUpdateDto response = profileService.getProfile(userId);
         return ResponseEntity.ok(response);
     }
 }

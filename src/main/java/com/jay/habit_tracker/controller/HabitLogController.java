@@ -1,7 +1,6 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.habit_log.HabitLogRequest;
-import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
+import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
 import com.jay.habit_tracker.service.HabitLogService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public class HabitLogController {
     @PostMapping("/update/{userId}")
     public ResponseEntity<?> updateHabitLog(
             @PathVariable Long userId,
-            @RequestBody HabitLogRequest habitLogRequest,
+            @RequestBody HabitLogUpdateDto habitLogUpdateDto,
             HttpServletRequest request
     ) {
         Long tokenUserId = jwtUtil.extractUserId(request); // You’ll implement this
@@ -30,7 +29,7 @@ public class HabitLogController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        HabitLogResponse updatedLog = habitLogService.updateHabitLog(habitLogRequest);
+        HabitLogUpdateDto updatedLog = habitLogService.updateHabitLog(habitLogUpdateDto);
         if (updatedLog == null) {
             return ResponseEntity.status(404).body(Map.of("error", "Habit not found or not owned by user"));
         }

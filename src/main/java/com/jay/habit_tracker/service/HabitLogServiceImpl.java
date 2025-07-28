@@ -1,7 +1,6 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.habit_log.HabitLogRequest;
-import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
+import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ public class HabitLogServiceImpl implements HabitLogService {
 
     @Override
     @Transactional
-    public HabitLogResponse updateHabitLog(HabitLogRequest request) {
+    public HabitLogUpdateDto updateHabitLog(HabitLogUpdateDto updateDto) {
         String sql = """
             INSERT INTO habit_logs (habit_id, date, completed)
             VALUES (:habitId, :date, :completed)
@@ -22,12 +21,12 @@ public class HabitLogServiceImpl implements HabitLogService {
         """;
 
         entityManager.createNativeQuery(sql)
-                .setParameter("habitId", request.getHabitId())
-                .setParameter("date", java.sql.Date.valueOf(request.getDate()))
-                .setParameter("completed", request.isCompleted())
+                .setParameter("habitId", updateDto.getHabitId())
+                .setParameter("date", java.sql.Date.valueOf(updateDto.getDate()))
+                .setParameter("completed", updateDto.isCompleted())
                 .executeUpdate();
 
-        return new HabitLogResponse(request.getHabitId(),request.getDate(),request.isCompleted());
+        return updateDto;
     }
 
 }

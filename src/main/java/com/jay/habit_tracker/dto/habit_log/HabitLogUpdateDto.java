@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitLogResponse {
+public class HabitLogUpdateDto {
     private Long habitId;
     private LocalDate date;
     private boolean completed;

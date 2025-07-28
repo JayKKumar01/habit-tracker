@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.habit.*;
-import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
+import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
 import com.jay.habit_tracker.entity.Habit;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.enums.Frequency;
@@ -121,7 +121,7 @@ public class HabitServiceImpl implements HabitService {
                 if (habit.getLogs() == null)
                     habit.setLogs(new ArrayList<>());
 
-                habit.getLogs().add(HabitLogResponse.builder()
+                habit.getLogs().add(HabitLogUpdateDto.builder()
                         .habitId(habitId)
                         .date(((java.sql.Date) logDateObj).toLocalDate())
                         .completed((Boolean) completedObj)
@@ -131,7 +131,7 @@ public class HabitServiceImpl implements HabitService {
 
 // Optional: Trim memory usage
         habitMap.values().forEach(habit -> {
-            List<HabitLogResponse> logs = habit.getLogs();
+            List<HabitLogUpdateDto> logs = habit.getLogs();
             if (logs instanceof ArrayList<?>) {
                 ((ArrayList<?>) logs).trimToSize();
             }

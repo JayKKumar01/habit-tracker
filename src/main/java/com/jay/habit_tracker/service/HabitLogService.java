@@ -1,8 +1,7 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.habit_log.HabitLogRequest;
-import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
+import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
 
 public interface HabitLogService {
-    HabitLogResponse updateHabitLog(HabitLogRequest request);
+    HabitLogUpdateDto updateHabitLog(HabitLogUpdateDto request);
 }

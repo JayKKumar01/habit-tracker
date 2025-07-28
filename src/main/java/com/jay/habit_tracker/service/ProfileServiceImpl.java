@@ -1,13 +1,15 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.profile.ProfileRequest;
-import com.jay.habit_tracker.dto.profile.ProfileResponse;
+import com.jay.habit_tracker.dto.profile.ProfileUpdateDto;
 import com.jay.habit_tracker.entity.Profile;
 import com.jay.habit_tracker.entity.User;
+import com.jay.habit_tracker.mapper.ProfileMapper;
 import com.jay.habit_tracker.repository.ProfileRepository;
 import com.jay.habit_tracker.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,33 +17,39 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
-
-    @Override
-    public ProfileResponse saveOrUpdate(Long userId, ProfileRequest profileRequest) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Profile profile = profileRepository.findByUser(user)
-                .orElse(new Profile());
-
-        profile.setUser(user);
-        profile.setBio(profileRequest.getBio());
-
-        profileRepository.save(profile);
-
-        return new ProfileResponse(user.getEmail(), profile.getBio());
-    }
+    private final EntityManager entityManager;
+    private final ProfileMapper profileMapper;
 
 
     @Override
-    public ProfileResponse getProfile(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    @Transactional
+    public ProfileUpdateDto saveOrUpdate(Long userId, ProfileUpdateDto updateDto) {
+        entityManager.createNativeQuery("""
+        INSERT INTO profiles (user_id, bio)
+        VALUES (:userId, :bio)
+        ON DUPLICATE KEY UPDATE bio = :bio
+    """)
+                .setParameter("userId", userId)
+                .setParameter("bio", updateDto.getBio())
+                .executeUpdate();
 
-        Profile profile = profileRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
-
-        return new ProfileResponse(user.getEmail(),profile.getBio());
+        return updateDto;
     }
+
+
+
+
+    @Override
+    public ProfileUpdateDto getProfile(Long userId) {
+        Profile profile = entityManager.createQuery("""
+            SELECT p FROM Profile p
+            WHERE p.user.id = :userId
+        """, Profile.class)
+                .setParameter("userId", userId)
+                .getSingleResult(); // ← This is correct for @OneToOne
+
+        return profileMapper.toDto(profile);
+    }
+
 }
 
