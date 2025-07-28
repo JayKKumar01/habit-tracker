@@ -6,7 +6,9 @@ import com.jay.habit_tracker.enums.Frequency;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +21,7 @@ public class HabitCustomRepositoryImpl implements HabitCustomRepository{
     private final EntityManager entityManager;
 
     @Override
+    @Transactional
     public List<HabitResponse> findHabitResponsesByUserId(Long userId) {
         String sql = """
             SELECT h.id, h.title, h.description, h.frequency,
@@ -54,6 +57,7 @@ public class HabitCustomRepositoryImpl implements HabitCustomRepository{
     }
 
     @Override
+    @Transactional
     public List<HabitLogResponse> findHabitLogResponsesByUserId(Long userId) {
         String sql = """
         SELECT hl.habit_id, hl.date, hl.completed
@@ -80,5 +84,28 @@ public class HabitCustomRepositoryImpl implements HabitCustomRepository{
 
         return result;
     }
+
+    @Override
+    @Transactional
+    public HabitLogResponse upsertHabitLog(Long habitId, LocalDate date, boolean completed) {
+        String sql = """
+            INSERT INTO habit_logs (habit_id, date, completed)
+            VALUES (:habitId, :date, :completed)
+            ON DUPLICATE KEY UPDATE completed = :completed
+        """;
+
+        entityManager.createNativeQuery(sql)
+                .setParameter("habitId", habitId)
+                .setParameter("date", java.sql.Date.valueOf(date))
+                .setParameter("completed", completed)
+                .executeUpdate();
+
+        return HabitLogResponse.builder()
+                .habitId(habitId)
+                .date(date)
+                .completed(completed)
+                .build();
+    }
+
 
 }

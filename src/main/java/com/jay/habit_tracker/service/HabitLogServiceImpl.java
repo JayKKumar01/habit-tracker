@@ -25,22 +25,28 @@ public class HabitLogServiceImpl implements HabitLogService {
 
     @Override
     public HabitLogResponse updateHabitLog(HabitLogRequest request) {
-        Habit habit = habitRepository.findById(request.getHabitId()).orElse(null);
-        if (habit == null){
-            return null;
-        }
-        HabitLog log = habitLogRepository.findByHabitIdAndDate(request.getHabitId(), request.getDate())
-                .orElseGet(() -> {
-                    HabitLog newLog = new HabitLog();
-                    newLog.setHabit(habit);
-                    newLog.setDate(request.getDate());
-                    return newLog;
-                });
+        return habitCustomRepository.upsertHabitLog(
+                request.getHabitId(),
+                request.getDate(),
+                request.isCompleted()
+        );
 
-        log.setCompleted(request.isCompleted());
-        habitLogRepository.save(log);
-
-        return habitLogMapper.toDto(request);
+//        Habit habit = habitRepository.findById(request.getHabitId()).orElse(null);
+//        if (habit == null){
+//            return null;
+//        }
+//        HabitLog log = habitLogRepository.findByHabitIdAndDate(request.getHabitId(), request.getDate())
+//                .orElseGet(() -> {
+//                    HabitLog newLog = new HabitLog();
+//                    newLog.setHabit(habit);
+//                    newLog.setDate(request.getDate());
+//                    return newLog;
+//                });
+//
+//        log.setCompleted(request.isCompleted());
+//        habitLogRepository.save(log);
+//
+//        return habitLogMapper.toDto(request);
     }
 
     @Override
