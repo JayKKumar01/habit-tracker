@@ -51,25 +51,6 @@ public class HabitLogServiceImpl implements HabitLogService {
     }
 
     @Override
-    public List<HabitLogResponse> getAllLogsForUser(String email) {
-        // ✅ Step 1: Get all habits owned by the user
-        List<Habit> userHabits = habitRepository.findByUserEmail(email);
-
-        // ✅ Step 2: Extract all habit IDs
-        List<Long> habitIds = userHabits.stream()
-                .map(Habit::getId)
-                .collect(Collectors.toList());
-
-        // ✅ Step 3: Fetch all logs for those habit IDs
-        List<HabitLog> allLogs = habitLogRepository.findByHabitIdIn(habitIds);
-
-        // ✅ Step 4: Convert to DTOs
-        return allLogs.stream()
-                .map(habitLogMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<HabitLogResponse> getAllLogsForUserId(Long userId) {
         return habitCustomRepository.findHabitLogResponsesByUserId(userId);
     }
