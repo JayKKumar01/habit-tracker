@@ -3,6 +3,7 @@ package com.jay.habit_tracker.service;
 import com.jay.habit_tracker.dto.HabitEditRequest;
 import com.jay.habit_tracker.dto.HabitRequest;
 import com.jay.habit_tracker.dto.HabitResponse;
+import com.jay.habit_tracker.dto.HabitWithLogsResponse;
 import com.jay.habit_tracker.entity.Habit;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.HabitMapper;
@@ -56,6 +57,11 @@ public class HabitServiceImpl implements HabitService {
     @Override
     public List<HabitResponse> getHabitsByUserId(Long userId) {
         return habitCustomRepository.findHabitResponsesByUserId(userId);
+    }
+
+    @Override
+    public List<HabitWithLogsResponse> getHabitWithLogsByUserId(Long userId) {
+        return habitCustomRepository.findHabitWithLogsByUserId(userId);
     }
 
     @Override
