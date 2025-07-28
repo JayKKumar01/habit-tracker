@@ -8,5 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ProfileUpdateDto {
+    private String name;
     private String bio;
 }

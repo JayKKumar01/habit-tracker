@@ -24,6 +24,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public ProfileUpdateDto saveOrUpdate(Long userId, ProfileUpdateDto updateDto) {
+        // ✅ Upsert into profiles (bio)
         entityManager.createNativeQuery("""
         INSERT INTO profiles (user_id, bio)
         VALUES (:userId, :bio)
@@ -33,8 +34,20 @@ public class ProfileServiceImpl implements ProfileService {
                 .setParameter("bio", updateDto.getBio())
                 .executeUpdate();
 
+        // ✅ Update users (name)
+        entityManager.createNativeQuery("""
+        UPDATE users
+        SET name = :name
+        WHERE id = :userId
+    """)
+                .setParameter("name", updateDto.getName())
+                .setParameter("userId", userId)
+                .executeUpdate();
+
         return updateDto;
     }
+
+
 
 
 
