@@ -2,7 +2,6 @@ package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.HabitLogRequest;
 import com.jay.habit_tracker.dto.HabitLogResponse;
-import com.jay.habit_tracker.entity.HabitLog;
 import com.jay.habit_tracker.service.HabitLogService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +42,7 @@ public class HabitLogController {
 
     // ✅ Get all habit logs for a habit (secured)
     @GetMapping("/all/{email}/{habitId}")
-    public ResponseEntity<?> getAllHabitLogs(
+    public ResponseEntity<?> getLogsByHabit(
             @PathVariable String email,
             @PathVariable Long habitId,
             HttpServletRequest request
@@ -53,19 +52,19 @@ public class HabitLogController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        List<HabitLogResponse> habitLogs = habitLogService.getAllLogsForHabit(habitId);
+        List<HabitLogResponse> habitLogs = habitLogService.getLogsByHabit(habitId);
         return ResponseEntity.ok(habitLogs);
     }
 
 //     ✅ NEW: Get all logs for a user (used to batch fetch logs for all habits)
     @GetMapping("/all/{userId}")
-    public ResponseEntity<?> getAllLogsForUserId(@PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<?> getLogsByUserId(@PathVariable Long userId, HttpServletRequest request) {
         Long tokenUserId = extractTokenUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        List<HabitLogResponse> userLogs = habitLogService.getAllLogsForUserId(userId);
+        List<HabitLogResponse> userLogs = habitLogService.getLogsByUserId(userId);
         return ResponseEntity.ok(userLogs);
     }
 

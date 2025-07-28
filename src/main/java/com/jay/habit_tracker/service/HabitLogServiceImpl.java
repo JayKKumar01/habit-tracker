@@ -30,34 +30,17 @@ public class HabitLogServiceImpl implements HabitLogService {
                 request.getDate(),
                 request.isCompleted()
         );
-
-//        Habit habit = habitRepository.findById(request.getHabitId()).orElse(null);
-//        if (habit == null){
-//            return null;
-//        }
-//        HabitLog log = habitLogRepository.findByHabitIdAndDate(request.getHabitId(), request.getDate())
-//                .orElseGet(() -> {
-//                    HabitLog newLog = new HabitLog();
-//                    newLog.setHabit(habit);
-//                    newLog.setDate(request.getDate());
-//                    return newLog;
-//                });
-//
-//        log.setCompleted(request.isCompleted());
-//        habitLogRepository.save(log);
-//
-//        return habitLogMapper.toDto(request);
     }
 
     @Override
-    public List<HabitLogResponse> getAllLogsForHabit(Long habitId) {
+    public List<HabitLogResponse> getLogsByHabit(Long habitId) {
         return habitLogRepository.findByHabitId(habitId).stream()
                 .map(habitLogMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<HabitLogResponse> getAllLogsForUserId(Long userId) {
+    public List<HabitLogResponse> getLogsByUserId(Long userId) {
         return habitCustomRepository.findHabitLogResponsesByUserId(userId);
     }
 

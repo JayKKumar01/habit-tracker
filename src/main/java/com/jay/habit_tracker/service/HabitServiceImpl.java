@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,15 +36,10 @@ public class HabitServiceImpl implements HabitService {
         return habitMapper.toDto(savedHabit);
     }
 
-    @Override
-    public List<HabitResponse> getHabitsByUserId(Long userId) {
-        return habitCustomRepository.findHabitResponsesByUserId(userId);
-    }
-
 
     @Override
-    public boolean editHabitByIdForUser(HabitEditRequest editRequest, String email) {
-        return habitRepository.findByIdAndUserEmail(editRequest.getHabitId(), email)
+    public boolean editHabit(HabitEditRequest editRequest) {
+        return habitRepository.findById(editRequest.getHabitId())
                 .map(habit -> {
                     habit.setTitle(editRequest.getTitle());
                     habit.setDescription(editRequest.getDescription());
@@ -60,8 +54,13 @@ public class HabitServiceImpl implements HabitService {
     }
 
     @Override
-    public boolean deleteHabitByIdForUser(Long habitId, String email) {
-        return habitRepository.findByIdAndUserEmail(habitId, email)
+    public List<HabitResponse> getHabitsByUserId(Long userId) {
+        return habitCustomRepository.findHabitResponsesByUserId(userId);
+    }
+
+    @Override
+    public boolean deleteHabit(Long habitId) {
+        return habitRepository.findById(habitId)
                 .map(habit -> {
                     habitRepository.delete(habit);
                     return true;

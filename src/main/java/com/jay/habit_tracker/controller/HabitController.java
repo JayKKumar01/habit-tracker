@@ -46,12 +46,23 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        boolean updated = habitService.editHabitByIdForUser(editRequest, email);
+        boolean updated = habitService.editHabit(editRequest);
         if (!updated) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied or habit not found"));
         }
 
         return ResponseEntity.ok(Map.of("message", "Habit edited", "response", editRequest.toString()));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getHabitsByUserId(@PathVariable Long userId, HttpServletRequest request) {
+        Long tokenUserId = extractTokenUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+
+        List<HabitResponse> habits = habitService.getHabitsByUserId(userId);
+        return ResponseEntity.ok(habits);
     }
 
     @DeleteMapping("/delete/{email}")
@@ -65,7 +76,7 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        boolean deleted = habitService.deleteHabitByIdForUser(deleteRequest.getHabitId(), email);
+        boolean deleted = habitService.deleteHabit(deleteRequest.getHabitId());
         if (!deleted) {
             return ResponseEntity.status(404).body(Map.of("error", "Habit not found or not authorized"));
         }
@@ -73,16 +84,7 @@ public class HabitController {
         return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserHabitsById(@PathVariable Long userId, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
-        if (tokenUserId == null || !tokenUserId.equals(userId)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
 
-        List<HabitResponse> habits = habitService.getHabitsByUserId(userId);
-        return ResponseEntity.ok(habits);
-    }
 
 
 
