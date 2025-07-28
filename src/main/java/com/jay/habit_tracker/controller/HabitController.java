@@ -72,17 +72,6 @@ public class HabitController {
         return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
     }
 
-
-    // ✅ Extract token email like in UserController
-    private String extractTokenEmail(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        String token = authHeader.substring(7);
-        return jwtUtil.extractEmail(token);
-    }
-
     // ✅ Extract token email like in UserController
     private Long extractTokenUserId(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
