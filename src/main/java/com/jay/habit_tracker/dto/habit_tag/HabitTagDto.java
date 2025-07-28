@@ -10,4 +10,5 @@ import lombok.*;
 public class HabitTagDto {
     private Long id;
     private String name;
+    private Long habitId;
 }

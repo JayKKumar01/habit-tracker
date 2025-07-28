@@ -35,6 +35,7 @@ public class HabitTagServiceImpl implements HabitTagService {
         return HabitTagDto.builder()
                 .id(tag.getId())
                 .name(tag.getName())
+                .habitId(habitId)
                 .build();
     }
 }

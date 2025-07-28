@@ -14,9 +14,10 @@ public interface HabitTagRepository extends JpaRepository<HabitTag, Long> {
     @Query(value = """
     SELECT ht.id AS id, ht.name AS name, htm.habit_id AS habitId
     FROM habit_tags ht
-    JOIN habit_tag_mapping htm ON ht.id = htm.tag_id
+    LEFT JOIN habit_tag_mapping htm ON ht.id = htm.tag_id
 """, nativeQuery = true)
     List<HabitTagProjectionDebug> getAllProjectedTags();
+
 
 
 }

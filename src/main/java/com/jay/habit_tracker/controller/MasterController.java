@@ -29,6 +29,32 @@ public class MasterController {
     private final HabitService habitService;
     private final HabitTagService habitTagService;
 
+
+    @PostMapping("/create-default-tags")
+    public ResponseEntity<List<Long>> createDefaultTags() {
+        List<String> defaultTagNames = List.of(
+                "Daily", "Weekly", "Morning", "Evening", "Health",
+                "Fitness", "Work", "Meditation", "Study",
+                "Productivity", "Personal", "Finance"
+        );
+
+        List<Long> tagIds = new ArrayList<>();
+
+        for (String tagName : defaultTagNames) {
+            String normalizedTag = tagName.trim().toLowerCase();
+
+            HabitTag tag = habitTagRepository.findByName(normalizedTag)
+                    .orElseGet(() -> habitTagRepository.save(
+                            HabitTag.builder().name(normalizedTag).build()
+                    ));
+
+            tagIds.add(tag.getId());
+        }
+
+        return ResponseEntity.status(201).body(tagIds);
+    }
+
+
     @PostMapping("/add-habit-tag/{habitId}")
     public ResponseEntity<?> addTagToHabit(
             @PathVariable Long habitId,
