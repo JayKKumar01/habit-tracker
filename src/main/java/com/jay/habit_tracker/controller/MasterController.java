@@ -1,10 +1,12 @@
 package com.jay.habit_tracker.controller;
 import com.jay.habit_tracker.dto.habit.HabitRequest;
 import com.jay.habit_tracker.dto.habit.HabitResponse;
+import com.jay.habit_tracker.dto.habit_tag.HabitTagDto;
 import com.jay.habit_tracker.entity.*;
 import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.repository.*;
 import com.jay.habit_tracker.service.HabitService;
+import com.jay.habit_tracker.service.HabitTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,8 +24,31 @@ public class MasterController {
     private final HabitRepository habitRepository;
     private final HabitLogRepository habitLogRepository;
     private final ProfileRepository profileRepository;
+    private final HabitTagRepository habitTagRepository;
     private final PasswordEncoder passwordEncoder;
     private final HabitService habitService;
+    private final HabitTagService habitTagService;
+
+    @PostMapping("/add-habit-tag/{habitId}")
+    public ResponseEntity<?> addTagToHabit(
+            @PathVariable Long habitId,
+            @RequestParam String tagName) {
+
+        HabitTagDto habitTag = habitTagService.addTagToHabit(habitId, tagName);
+
+        if (habitTag == null) {
+            return ResponseEntity
+                    .status(409)
+                    .body("Tag already exists for this habit.");
+        }
+
+        return ResponseEntity
+                .status(201)
+                .body(habitTag);
+    }
+
+
+
 
     @PostMapping("/createHabit/{userId}/{count}")
     public ResponseEntity<List<HabitResponse>> createHabitWithoutAuth(
@@ -131,6 +156,16 @@ public class MasterController {
                 .append("<td>").append(l.getHabitId()).append("</td>")
                 .append("</tr>"));
         html.append("</table><br>");
+
+        // Habit Tags
+        html.append("<h2>Habit Tags</h2><table border='1'><tr><th>Tag ID</th><th>Name</th><th>Habit ID</th></tr>");
+        habitTagRepository.getAllProjectedTags().forEach(tag -> html.append("<tr>")
+                .append("<td>").append(tag.getId()).append("</td>")
+                .append("<td>").append(htmlEscape(tag.getName())).append("</td>")
+                .append("<td>").append(tag.getHabitId()).append("</td>")
+                .append("</tr>"));
+        html.append("</table><br>");
+
 
         html.append("</body></html>");
         return ResponseEntity.ok().header("Content-Type", "text/html").body(html.toString());

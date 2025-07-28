@@ -59,4 +59,14 @@ public class Habit {
 
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HabitLog> habitLogs = new ArrayList<>();
+
+    // ✅ Many-to-Many owning side
+    @ManyToMany
+    @JoinTable(
+            name = "habit_tag_mapping",
+            joinColumns = @JoinColumn(name = "habit_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<HabitTag> tags = new HashSet<>();
+
 }

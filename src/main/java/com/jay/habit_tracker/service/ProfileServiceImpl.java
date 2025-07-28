@@ -48,10 +48,6 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
 
-
-
-
-
     @Override
     public ProfileUpdateDto getProfile(Long userId) {
         Profile profile = entityManager.createQuery("""
