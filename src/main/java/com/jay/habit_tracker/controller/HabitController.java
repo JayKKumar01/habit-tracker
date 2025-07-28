@@ -73,20 +73,7 @@ public class HabitController {
         return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
     }
 
-
-    // ✅ Get user habits (secured)
-    @GetMapping("/user-email/{email}")
-    public ResponseEntity<?> getUserHabits(@PathVariable String email, HttpServletRequest request) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
-
-        List<HabitResponse> habits = habitService.getHabitsByUser(email);
-        return ResponseEntity.ok(habits);
-    }
-
-    @GetMapping("/user-id/{userId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserHabitsById(@PathVariable Long userId, HttpServletRequest request) {
         Long tokenUserId = extractTokenUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {

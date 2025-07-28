@@ -40,17 +40,6 @@ public class HabitServiceImpl implements HabitService {
     @Override
     public List<HabitResponse> getHabitsByUserId(Long userId) {
         return habitCustomRepository.findHabitResponsesByUserId(userId);
-//        return habitRepository.findByUserId(userId).stream()
-//                .map(habitMapper::toDto)
-//                .collect(Collectors.toList());
-    }
-
-
-    @Override
-    public List<HabitResponse> getHabitsByUser(String userEmail) {
-        return habitRepository.findByUserEmail(userEmail).stream()
-                .map(habitMapper::toDto)
-                .collect(Collectors.toList());
     }
 
 

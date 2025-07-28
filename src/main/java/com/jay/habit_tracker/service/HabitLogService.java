@@ -11,4 +11,6 @@ public interface HabitLogService {
     List<HabitLogResponse> getAllLogsForHabit(Long habitId);
 
     List<HabitLogResponse> getAllLogsForUser(String email);
+
+    List<HabitLogResponse> getAllLogsForUserId(Long userId);
 }
