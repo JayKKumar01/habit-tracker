@@ -1,8 +1,8 @@
 package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.AuthRequest;
-import com.jay.habit_tracker.dto.UserDto;
-import com.jay.habit_tracker.dto.UserRegistration;
+import com.jay.habit_tracker.dto.user.UserResponse;
+import com.jay.habit_tracker.dto.user.UserRegistration;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.UserMapper;
 import com.jay.habit_tracker.repository.UserRepository;
@@ -21,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder; // ✅ Injected
 
     @Override
-    public UserDto signup(UserRegistration dto) {
+    public UserResponse signup(UserRegistration dto) {
         User user = userMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword())); // ✅ Hashing password
         userRepository.save(user);

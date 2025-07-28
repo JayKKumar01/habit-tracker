@@ -1,6 +1,6 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.*;
+import com.jay.habit_tracker.dto.habit.*;
 import com.jay.habit_tracker.service.HabitService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/habits")
@@ -23,7 +22,7 @@ public class HabitController {
     // ✅ Create habit (secured)
     @PostMapping("/create/{userId}")
     public ResponseEntity<?> createHabit(@PathVariable Long userId, @RequestBody HabitRequest requestDTO, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
+        Long tokenUserId = jwtUtil.extractUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
@@ -34,13 +33,13 @@ public class HabitController {
 
     // ✅ Edit habit (secured)
     @PutMapping("/edit/{userId}")
-    public ResponseEntity<?> editHabit(@PathVariable Long userId, @RequestBody HabitEditRequest editRequest, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
+    public ResponseEntity<?> updateHabit(@PathVariable Long userId, @RequestBody HabitUpdateDto editRequest, HttpServletRequest request) {
+        Long tokenUserId = jwtUtil.extractUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        HabitEditResponse updated = habitService.editHabit(editRequest);
+        HabitUpdateDto updated = habitService.updateHabit(editRequest);
         return ResponseEntity.ok(updated); // 200 OK for updates
     }
 
@@ -48,7 +47,7 @@ public class HabitController {
 
     @GetMapping("/habitsAndLogs/{userId}")
     public ResponseEntity<?> getHabitWithLogsByUserId(@PathVariable Long userId, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
+        Long tokenUserId = jwtUtil.extractUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
@@ -57,28 +56,21 @@ public class HabitController {
         return ResponseEntity.ok(habits);
     }
 
-    @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<?> deleteHabit(@PathVariable Long userId, @RequestBody HabitDeleteRequest deleteRequest, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
+    @DeleteMapping("/delete/{userId}/{habitId}")
+    public ResponseEntity<?> deleteHabit(@PathVariable Long userId,
+                                         @PathVariable Long habitId,
+                                         HttpServletRequest request) {
+        Long tokenUserId = jwtUtil.extractUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        boolean deleted = habitService.deleteHabit(deleteRequest.getHabitId());
+        boolean deleted = habitService.deleteHabit(habitId);
         if (!deleted) {
             return ResponseEntity.status(404).body(Map.of("error", "Habit not found or not authorized"));
         }
 
-        return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
+        return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", habitId));
     }
 
-    // ✅ Extract token email like in UserController
-    private Long extractTokenUserId(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        String token = authHeader.substring(7);
-        return jwtUtil.extractUserId(token);
-    }
 }

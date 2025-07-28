@@ -1,10 +1,10 @@
 package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.AuthRequest;
-import com.jay.habit_tracker.dto.UserDto;
-import com.jay.habit_tracker.dto.UserRegistration;
+import com.jay.habit_tracker.dto.user.UserResponse;
+import com.jay.habit_tracker.dto.user.UserRegistration;
 
 public interface AuthService {
-    UserDto signup(UserRegistration dto);
+    UserResponse signup(UserRegistration dto);
     String login(AuthRequest request);
 }

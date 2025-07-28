@@ -1,6 +1,6 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.UserDto;
+import com.jay.habit_tracker.dto.user.UserResponse;
 import com.jay.habit_tracker.service.UserService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,22 +20,22 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> getUserByEmail(@RequestParam String email, HttpServletRequest request) {
-        String tokenEmail = extractTokenEmail(request);
+        String tokenEmail = jwtUtil.extractEmail(request);
         if (tokenEmail == null || !tokenEmail.equals(email)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        UserDto userDto = userService.getUserByEmail(email);
-        if (userDto == null) {
+        UserResponse userResponse = userService.getUserByEmail(email);
+        if (userResponse == null) {
             return ResponseEntity.status(404).body(Map.of("message", "User with email " + email + " not found."));
         }
 
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(userResponse);
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteUserByEmail(@RequestParam String email, HttpServletRequest request) {
-        String tokenEmail = extractTokenEmail(request);
+        String tokenEmail = jwtUtil.extractEmail(request);
         if (tokenEmail == null || !tokenEmail.equals(email)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
@@ -46,14 +46,5 @@ public class UserController {
         }
 
         return ResponseEntity.noContent().build();
-    }
-
-    private String extractTokenEmail(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        String token = authHeader.substring(7);
-        return jwtUtil.extractEmail(token);
     }
 }

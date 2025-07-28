@@ -1,12 +1,9 @@
 package com.jay.habit_tracker.service;
 
 
-import com.jay.habit_tracker.dto.UserDto;
-
-import java.util.List;
+import com.jay.habit_tracker.dto.user.UserResponse;
 
 public interface UserService {
-    List<UserDto> getAllUsers();
-    UserDto getUserByEmail(String email);
+    UserResponse getUserByEmail(String email);
     boolean deleteUserByEmail(String email);
 }

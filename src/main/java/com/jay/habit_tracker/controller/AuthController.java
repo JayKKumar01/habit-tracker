@@ -2,7 +2,7 @@ package com.jay.habit_tracker.controller;
 
 import com.jay.habit_tracker.dto.AuthRequest;
 import com.jay.habit_tracker.dto.AuthResponse;
-import com.jay.habit_tracker.dto.UserRegistration;
+import com.jay.habit_tracker.dto.user.UserRegistration;
 import com.jay.habit_tracker.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

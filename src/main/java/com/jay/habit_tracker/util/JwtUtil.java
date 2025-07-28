@@ -3,6 +3,7 @@ package com.jay.habit_tracker.util;
 import com.jay.habit_tracker.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -28,6 +29,15 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String extractEmail(HttpServletRequest request) {
+        String token = extractToken(request);
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -37,7 +47,8 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    public Long extractUserId(String token) {
+    public Long extractUserId(HttpServletRequest request) {
+        String token = extractToken(request);
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -56,5 +67,15 @@ public class JwtUtil {
         } catch (JwtException e) {
             return false;
         }
+    }
+
+
+
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        return authHeader.substring(7);
     }
 }

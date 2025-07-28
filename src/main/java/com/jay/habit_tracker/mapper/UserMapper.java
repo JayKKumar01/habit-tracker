@@ -1,13 +1,12 @@
 package com.jay.habit_tracker.mapper;
 
-import com.jay.habit_tracker.dto.UserDto;
-import com.jay.habit_tracker.dto.UserRegistration;
+import com.jay.habit_tracker.dto.user.UserResponse;
+import com.jay.habit_tracker.dto.user.UserRegistration;
 import com.jay.habit_tracker.entity.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    UserDto toDto(User user);                            // for responses
-    User toEntity(UserDto dto);                          // unused for now but okay to keep
+    UserResponse toDto(User user);                            // for responses
     User toEntity(UserRegistration dto);              // new: for user creation
 }

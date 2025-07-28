@@ -1,10 +1,9 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.ProfileRequest;
-import com.jay.habit_tracker.dto.ProfileResponse;
+import com.jay.habit_tracker.dto.profile.ProfileRequest;
+import com.jay.habit_tracker.dto.profile.ProfileResponse;
 
 public interface ProfileService {
-    ProfileResponse saveOrUpdate(String email, ProfileRequest bio);
-
-    ProfileResponse getProfileByEmail(String email);
+    ProfileResponse saveOrUpdate(Long email, ProfileRequest bio);
+    ProfileResponse getProfile(Long email);
 }

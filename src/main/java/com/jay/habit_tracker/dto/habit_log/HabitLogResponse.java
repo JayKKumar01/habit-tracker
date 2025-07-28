@@ -1,4 +1,4 @@
-package com.jay.habit_tracker.dto;
+package com.jay.habit_tracker.dto.habit_log;
 
 import lombok.*;
 
@@ -9,7 +9,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
-public class HabitDeleteRequest {
+public class HabitLogResponse {
     private Long habitId;
+    private LocalDate date;
+    private boolean completed;
 }

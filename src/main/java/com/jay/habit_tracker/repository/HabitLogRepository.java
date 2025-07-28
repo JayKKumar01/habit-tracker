@@ -13,14 +13,6 @@ import java.util.Optional;
 @Repository
 public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
 
-    // Custom method to get all HabitLogs for a given habit ID
-    List<HabitLog> findByHabitId(Long habitId);
-
-    // Get a specific log by habit ID and date
-    Optional<HabitLog> findByHabitIdAndDate(Long habitId, LocalDate date);
-
-    List<HabitLog> findByHabitIdIn(List<Long> habitIds);
-
     @Query(value = "SELECT id, date, completed, habit_id AS habitId FROM habit_logs", nativeQuery = true)
     List<HabitLogProjectionDebug> getAllProjectedLogs();
 

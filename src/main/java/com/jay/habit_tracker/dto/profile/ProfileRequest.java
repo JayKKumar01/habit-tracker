@@ -1,4 +1,4 @@
-package com.jay.habit_tracker.dto;
+package com.jay.habit_tracker.dto.profile;
 
 import lombok.*;
 

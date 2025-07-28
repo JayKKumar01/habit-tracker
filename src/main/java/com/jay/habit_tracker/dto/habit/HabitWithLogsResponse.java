@@ -1,10 +1,12 @@
-package com.jay.habit_tracker.dto;
+package com.jay.habit_tracker.dto.habit;
 
+import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -12,11 +14,15 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitResponse {
+public class HabitWithLogsResponse {
     private Long id;
     private String title;
     private String description;
     private Frequency frequency;
-    private Set<DayOfWeek> targetDays; // e.g., ["MONDAY", "WEDNESDAY"]
+    private Set<DayOfWeek> targetDays;
     private LocalDate startDate;
+    private LocalDate endDate;
+    
+    // ✅ List of associated log entries
+    private List<HabitLogResponse> logs;
 }

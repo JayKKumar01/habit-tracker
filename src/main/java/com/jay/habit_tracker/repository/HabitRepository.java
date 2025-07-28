@@ -5,15 +5,9 @@ import com.jay.habit_tracker.projection_debug.HabitProjectionDebug;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public interface HabitRepository extends JpaRepository<Habit, Long> {
-    List<Habit> findByUserId(Long userId);
-    List<Habit> findByUserEmail(String email);
-    // Finds habit by ID AND the associated user's email
-    Optional<Habit> findByIdAndUserEmail(Long id, String email);
     @Query(value = """
     SELECT
         h.id,
@@ -30,6 +24,4 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
     GROUP BY h.id
 """, nativeQuery = true)
     List<HabitProjectionDebug> getAllProjectedHabits();
-
-
 }

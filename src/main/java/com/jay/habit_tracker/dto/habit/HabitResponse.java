@@ -1,4 +1,4 @@
-package com.jay.habit_tracker.dto;
+package com.jay.habit_tracker.dto.habit;
 
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
@@ -12,10 +12,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
-public class HabitEditRequest {
-    private Long habitId;
+public class HabitResponse {
+    private Long id;
     private String title;
     private String description;
-    private LocalDate endDate;
+    private Frequency frequency;
+    private Set<DayOfWeek> targetDays; // e.g., ["MONDAY", "WEDNESDAY"]
+    private LocalDate startDate;
 }

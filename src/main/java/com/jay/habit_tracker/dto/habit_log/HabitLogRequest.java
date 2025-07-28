@@ -1,8 +1,7 @@
-package com.jay.habit_tracker.dto;
+package com.jay.habit_tracker.dto.habit_log;
 
 import lombok.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Getter

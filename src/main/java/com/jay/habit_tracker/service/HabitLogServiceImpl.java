@@ -1,26 +1,16 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.HabitLogRequest;
-import com.jay.habit_tracker.dto.HabitLogResponse;
-import com.jay.habit_tracker.entity.Habit;
-import com.jay.habit_tracker.entity.HabitLog;
-import com.jay.habit_tracker.mapper.HabitLogMapper;
-import com.jay.habit_tracker.repository.HabitCustomRepository;
-import com.jay.habit_tracker.repository.HabitLogRepository;
-import com.jay.habit_tracker.repository.HabitRepository;
+import com.jay.habit_tracker.dto.habit_log.HabitLogRequest;
+import com.jay.habit_tracker.dto.habit_log.HabitLogResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class HabitLogServiceImpl implements HabitLogService {
     private final EntityManager entityManager;
-    private final HabitLogMapper habitLogMapper;
 
     @Override
     @Transactional
@@ -37,7 +27,7 @@ public class HabitLogServiceImpl implements HabitLogService {
                 .setParameter("completed", request.isCompleted())
                 .executeUpdate();
 
-        return habitLogMapper.toDto(request);
+        return new HabitLogResponse(request.getHabitId(),request.getDate(),request.isCompleted());
     }
 
 }

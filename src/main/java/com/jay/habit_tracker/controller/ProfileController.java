@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.ProfileRequest;
-import com.jay.habit_tracker.dto.ProfileResponse;
+import com.jay.habit_tracker.dto.profile.ProfileRequest;
+import com.jay.habit_tracker.dto.profile.ProfileResponse;
 import com.jay.habit_tracker.service.ProfileService;
 import com.jay.habit_tracker.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 @RestController
 @RequestMapping("/api/profile")
 @RequiredArgsConstructor
@@ -20,43 +19,33 @@ public class ProfileController {
     private final JwtUtil jwtUtil;
 
     // ✅ Create or update profile bio (secured)
-    @PostMapping("/save/{email}")
+    @PostMapping("/save/{userId}")
     public ResponseEntity<?> saveOrUpdateProfile(
-            @PathVariable String email,
+            @PathVariable Long userId,
             @RequestBody ProfileRequest profileRequest,
             HttpServletRequest request
     ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
+        Long tokenUserId = jwtUtil.extractUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        ProfileResponse response = profileService.saveOrUpdate(email, profileRequest);
+        ProfileResponse response = profileService.saveOrUpdate(userId, profileRequest);
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Get profile by user email (secured)
-    @GetMapping("/user/{email}")
+    // ✅ Get profile by userId (secured)
+    @GetMapping("/user/{userId}")
     public ResponseEntity<?> getProfile(
-            @PathVariable String email,
+            @PathVariable Long userId,
             HttpServletRequest request
     ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
+        Long tokenUserId = jwtUtil.extractUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        ProfileResponse response = profileService.getProfileByEmail(email);
+        ProfileResponse response = profileService.getProfile(userId);
         return ResponseEntity.ok(response);
-    }
-
-    // ✅ Extract token email
-    private String extractTokenEmail(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        String token = authHeader.substring(7);
-        return jwtUtil.extractEmail(token);
     }
 }
