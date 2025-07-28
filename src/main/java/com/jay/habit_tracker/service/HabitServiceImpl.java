@@ -3,19 +3,24 @@ package com.jay.habit_tracker.service;
 import com.jay.habit_tracker.dto.habit.*;
 import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
 import com.jay.habit_tracker.entity.Habit;
+import com.jay.habit_tracker.entity.HabitTag;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.mapper.HabitMapper;
 import com.jay.habit_tracker.repository.HabitRepository;
+import com.jay.habit_tracker.repository.HabitTagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -24,17 +29,41 @@ public class HabitServiceImpl implements HabitService {
     private final HabitRepository habitRepository;
     private final HabitMapper habitMapper;
     private final EntityManager entityManager;
+    private final HabitTagRepository habitTagRepository;
 
     @Override
     public HabitResponse createHabit(Long userId, HabitRequest habitRequest) {
-        User userRef = entityManager.getReference(User.class, userId); // no DB hit
-
+        User userRef = entityManager.getReference(User.class, userId);
         Habit habit = habitMapper.toEntity(habitRequest);
         habit.setUser(userRef);
+        habit.setTags(new HashSet<>());
 
-        Habit savedHabit = habitRepository.save(habit);
-        return habitMapper.toDto(savedHabit);
+        // Add frequency-based tag
+        Long freqTagId = habitRequest.getFrequency() == Frequency.DAILY ? 1L : 3L;
+        habit.getTags().add(entityManager.getReference(HabitTag.class, freqTagId));
+
+        // Handle user-provided tag names
+        Set<String> tagNames = habitRequest.getTagNames();
+        if (tagNames != null && !tagNames.isEmpty()) {
+            List<HabitTag> existing = habitTagRepository.findByNameIn(tagNames);
+            Set<String> existingNames = existing.stream().map(HabitTag::getName).collect(Collectors.toSet());
+
+            // Create any new tags not found
+            List<HabitTag> newTags = tagNames.stream()
+                    .filter(name -> !existingNames.contains(name))
+                    .map(name -> HabitTag.builder().name(name).build()) // assuming constructor (id, name)
+                    .toList();
+
+            habitTagRepository.saveAll(newTags);
+            habit.getTags().addAll(existing);
+            habit.getTags().addAll(newTags);
+        }
+
+        return habitMapper.toDto(habitRepository.save(habit));
     }
+
+
+
 
 
 

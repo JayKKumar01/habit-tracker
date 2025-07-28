@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface HabitTagRepository extends JpaRepository<HabitTag, Long> {
     Optional<HabitTag> findByName(String normalizedTag);
@@ -19,5 +20,5 @@ public interface HabitTagRepository extends JpaRepository<HabitTag, Long> {
     List<HabitTagProjectionDebug> getAllProjectedTags();
 
 
-
+    List<HabitTag> findByNameIn(Set<String> requestedTagNames);
 }
