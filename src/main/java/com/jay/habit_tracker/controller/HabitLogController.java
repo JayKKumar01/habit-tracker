@@ -20,15 +20,14 @@ public class HabitLogController {
     private final HabitLogService habitLogService;
     private final JwtUtil jwtUtil;
 
-    // ✅ Update or Create Habit Log (secured)
-    @PostMapping("/update/{email}")
+    @PostMapping("/update/{userId}")
     public ResponseEntity<?> updateHabitLog(
-            @PathVariable String email,
+            @PathVariable Long userId,
             @RequestBody HabitLogRequest habitLogRequest,
             HttpServletRequest request
     ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
+        Long tokenUserId = extractTokenUserId(request); // You’ll implement this
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
@@ -40,13 +39,14 @@ public class HabitLogController {
         return ResponseEntity.ok(updatedLog);
     }
 
+
     // ✅ Reuse token-email extraction
-    private String extractTokenEmail(HttpServletRequest request) {
+    private Long extractTokenUserId(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
         }
         String token = authHeader.substring(7);
-        return jwtUtil.extractEmail(token);
+        return jwtUtil.extractUserId(token);
     }
 }
