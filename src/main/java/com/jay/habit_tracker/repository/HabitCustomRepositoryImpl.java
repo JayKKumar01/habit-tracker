@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -126,42 +128,66 @@ public class HabitCustomRepositoryImpl implements HabitCustomRepository{
                 .setParameter("userId", userId)
                 .getResultList();
 
-        Map<Long, HabitWithLogsResponse> habitMap = new LinkedHashMap<>(); // Preserve order
+        Map<Long, HabitWithLogsResponse> habitMap = new LinkedHashMap<>();
 
         for (Object[] row : rows) {
             Long habitId = ((Number) row[0]).longValue();
+            String targetDaysRaw = (String) row[4];
 
-            // Create habit object if not already in map
             HabitWithLogsResponse habit = habitMap.get(habitId);
             if (habit == null) {
+                // ✅ Convert comma-separated string into EnumSet<DayOfWeek>
+                Set<DayOfWeek> targetDays = (targetDaysRaw == null || targetDaysRaw.isBlank())
+                        ? EnumSet.noneOf(DayOfWeek.class)
+                        : EnumSet.copyOf(
+                        Arrays.stream(targetDaysRaw.split(","))
+                                .map(String::trim)
+                                .map(DayOfWeek::valueOf)
+                                .collect(Collectors.toSet())
+                );
+
                 habit = HabitWithLogsResponse.builder()
                         .id(habitId)
                         .title((String) row[1])
                         .description((String) row[2])
                         .frequency(Frequency.valueOf((String) row[3]))
-                        .targetDays(row[4] == null
-                                ? Set.of()
-                                : new HashSet<>(List.of(((String) row[4]).split(","))))
+                        .targetDays(targetDays)
                         .startDate(((java.sql.Date) row[5]).toLocalDate())
                         .endDate(row[6] == null ? null : ((java.sql.Date) row[6]).toLocalDate())
-                        .logs(new ArrayList<>()) // initialize logs list
                         .build();
+
                 habitMap.put(habitId, habit);
             }
 
-            // Add log if present
-            if (row[7] != null && row[8] != null) {
-                HabitLogResponse log = HabitLogResponse.builder()
+            Object logDateObj = row[7];
+            Object completedObj = row[8];
+
+            if (logDateObj != null && completedObj != null) {
+                if (habit.getLogs() == null)
+                    habit.setLogs(new ArrayList<>());
+
+                habit.getLogs().add(HabitLogResponse.builder()
                         .habitId(habitId)
-                        .date(((java.sql.Date) row[7]).toLocalDate())
-                        .completed((Boolean) row[8])
-                        .build();
-                habit.getLogs().add(log);
+                        .date(((java.sql.Date) logDateObj).toLocalDate())
+                        .completed((Boolean) completedObj)
+                        .build());
             }
         }
 
+// Optional: Trim memory usage
+        habitMap.values().forEach(habit -> {
+            List<HabitLogResponse> logs = habit.getLogs();
+            if (logs instanceof ArrayList<?>) {
+                ((ArrayList<?>) logs).trimToSize();
+            }
+        });
+
         return new ArrayList<>(habitMap.values());
+
+
+
     }
+
 
 
 
