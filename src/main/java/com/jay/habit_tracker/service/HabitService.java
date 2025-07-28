@@ -8,9 +8,8 @@ import com.jay.habit_tracker.dto.HabitWithLogsResponse;
 import java.util.List;
 
 public interface HabitService {
-    HabitResponse createHabit(String userEmail, HabitRequest habitRequest);
+    HabitResponse createHabit(Long userId, HabitRequest habitRequest);
     boolean editHabit(HabitEditRequest editRequest);
-    List<HabitResponse> getHabitsByUserId(Long userId);
     List<HabitWithLogsResponse> getHabitWithLogsByUserId(Long userId);
     boolean deleteHabit(Long habitId);
 

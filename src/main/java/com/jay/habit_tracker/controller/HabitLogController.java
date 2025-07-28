@@ -40,34 +40,6 @@ public class HabitLogController {
         return ResponseEntity.ok(updatedLog);
     }
 
-    // ✅ Get all habit logs for a habit (secured)
-    @GetMapping("/all/{email}/{habitId}")
-    public ResponseEntity<?> getLogsByHabit(
-            @PathVariable String email,
-            @PathVariable Long habitId,
-            HttpServletRequest request
-    ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
-
-        List<HabitLogResponse> habitLogs = habitLogService.getLogsByHabit(habitId);
-        return ResponseEntity.ok(habitLogs);
-    }
-
-//     ✅ NEW: Get all logs for a user (used to batch fetch logs for all habits)
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<?> getLogsByUserId(@PathVariable Long userId, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
-        if (tokenUserId == null || !tokenUserId.equals(userId)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
-
-        List<HabitLogResponse> userLogs = habitLogService.getLogsByUserId(userId);
-        return ResponseEntity.ok(userLogs);
-    }
-
     // ✅ Reuse token-email extraction
     private String extractTokenEmail(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -76,15 +48,5 @@ public class HabitLogController {
         }
         String token = authHeader.substring(7);
         return jwtUtil.extractEmail(token);
-    }
-
-    // ✅ Extract token email like in UserController
-    private Long extractTokenUserId(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        String token = authHeader.substring(7);
-        return jwtUtil.extractUserId(token);
     }
 }

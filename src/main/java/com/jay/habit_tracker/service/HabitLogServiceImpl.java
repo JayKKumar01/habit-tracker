@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HabitLogServiceImpl implements HabitLogService {
 
-    private final HabitRepository habitRepository;
-    private final HabitLogRepository habitLogRepository;
-    private final HabitLogMapper habitLogMapper;
     private final HabitCustomRepository habitCustomRepository;
 
     @Override
@@ -30,18 +27,6 @@ public class HabitLogServiceImpl implements HabitLogService {
                 request.getDate(),
                 request.isCompleted()
         );
-    }
-
-    @Override
-    public List<HabitLogResponse> getLogsByHabit(Long habitId) {
-        return habitLogRepository.findByHabitId(habitId).stream()
-                .map(habitLogMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<HabitLogResponse> getLogsByUserId(Long userId) {
-        return habitCustomRepository.findHabitLogResponsesByUserId(userId);
     }
 
 }

@@ -39,20 +39,20 @@ public class HabitCustomRepositoryImpl implements HabitCustomRepository{
                 .getResultList();
 
         List<HabitResponse> result = new ArrayList<>();
-        for (Object[] row : rows) {
-            HabitResponse dto = HabitResponse.builder()
-                    .id(((Number) row[0]).longValue())
-                    .title((String) row[1])
-                    .description((String) row[2])
-                    .frequency(Frequency.valueOf((String) row[3]))
-                    .targetDays(row[4] == null
-                            ? Set.of()
-                            : new HashSet<>(List.of(((String) row[4]).split(","))))
-                    .startDate(((java.sql.Date) row[5]).toLocalDate())
-                    .endDate(row[6] == null ? null : ((java.sql.Date) row[6]).toLocalDate())
-                    .build();
-            result.add(dto);
-        }
+//        for (Object[] row : rows) {
+//            HabitResponse dto = HabitResponse.builder()
+//                    .id(((Number) row[0]).longValue())
+//                    .title((String) row[1])
+//                    .description((String) row[2])
+//                    .frequency(Frequency.valueOf((String) row[3]))
+//                    .targetDays(row[4] == null
+//                            ? Set.of()
+//                            : new HashSet<>(List.of(((String) row[4]).split(","))))
+//                    .startDate(((java.sql.Date) row[5]).toLocalDate())
+//                    .endDate(row[6] == null ? null : ((java.sql.Date) row[6]).toLocalDate())
+//                    .build();
+//            result.add(dto);
+//        }
         return result;
     }
 

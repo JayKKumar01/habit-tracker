@@ -6,6 +6,10 @@ import com.jay.habit_tracker.entity.Habit;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.time.DayOfWeek;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Mapper(componentModel = "spring")
 public interface HabitMapper {
 

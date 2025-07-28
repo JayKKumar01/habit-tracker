@@ -1,8 +1,10 @@
 package com.jay.habit_tracker.controller;
 import com.jay.habit_tracker.dto.*;
 import com.jay.habit_tracker.entity.*;
+import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.mapper.*;
 import com.jay.habit_tracker.repository.*;
+import com.jay.habit_tracker.service.HabitService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,9 +34,42 @@ public class MasterController {
     private final HabitMapper habitMapper;
     private final HabitLogMapper habitLogMapper;
     private final PasswordEncoder passwordEncoder;
+    private final HabitService habitService;
+
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @PostMapping("/createHabit/{userId}/{count}")
+    public ResponseEntity<List<HabitResponse>> createHabitWithoutAuth(
+            @PathVariable Long userId,
+            @PathVariable int count) {
+
+        List<HabitResponse> createdHabits = new ArrayList<>();
+
+        for (int i = 1; i <= count; i++) {
+            System.out.println("Creating Habit #" + i);
+
+            HabitRequest requestDTO = new HabitRequest();
+            requestDTO.setTitle("Habit " + i);
+            requestDTO.setDescription("Description for Habit " + i);
+            requestDTO.setFrequency(Frequency.DAILY);
+            requestDTO.setTargetDays(Set.of(
+                    "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY",
+                    "FRIDAY", "SATURDAY", "SUNDAY"
+            ));
+            requestDTO.setStartDate(LocalDate.parse("2025-07-28"));
+
+            HabitResponse response = habitService.createHabit(userId, requestDTO);
+            createdHabits.add(response);
+        }
+
+        return ResponseEntity.status(201).body(createdHabits);
+    }
+
+
+
+
 
     @DeleteMapping("/drop-old-target-days-table")
     @Transactional

@@ -20,18 +20,14 @@ public class HabitController {
     private final JwtUtil jwtUtil;
 
     // ✅ Create habit (secured)
-    @PostMapping("/create/{email}")
-    public ResponseEntity<?> createHabit(
-            @PathVariable String email,
-            @RequestBody HabitRequest requestDTO,
-            HttpServletRequest request
-    ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
+    @PostMapping("/create/{userId}")
+    public ResponseEntity<?> createHabit(@PathVariable Long userId, @RequestBody HabitRequest requestDTO, HttpServletRequest request) {
+        Long tokenUserId = extractTokenUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        HabitResponse created = habitService.createHabit(email, requestDTO);
+        HabitResponse created = habitService.createHabit(userId, requestDTO);
         return ResponseEntity.status(201).body(created);
     }
 
@@ -52,17 +48,6 @@ public class HabitController {
         }
 
         return ResponseEntity.ok(Map.of("message", "Habit edited", "response", editRequest.toString()));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getHabitsByUserId(@PathVariable Long userId, HttpServletRequest request) {
-        Long tokenUserId = extractTokenUserId(request);
-        if (tokenUserId == null || !tokenUserId.equals(userId)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
-
-        List<HabitResponse> habits = habitService.getHabitsByUserId(userId);
-        return ResponseEntity.ok(habits);
     }
 
     @GetMapping("/habitsAndLogs/{userId}")
@@ -94,10 +79,6 @@ public class HabitController {
 
         return ResponseEntity.ok(Map.of("message", "Habit deleted", "habitId", deleteRequest.getHabitId()));
     }
-
-
-
-
 
     // ✅ Extract token email like in UserController
     private String extractTokenEmail(HttpServletRequest request) {

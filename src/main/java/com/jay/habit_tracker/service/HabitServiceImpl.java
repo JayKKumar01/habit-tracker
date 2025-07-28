@@ -10,6 +10,7 @@ import com.jay.habit_tracker.mapper.HabitMapper;
 import com.jay.habit_tracker.repository.HabitCustomRepository;
 import com.jay.habit_tracker.repository.HabitRepository;
 import com.jay.habit_tracker.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,21 +22,33 @@ import java.util.List;
 public class HabitServiceImpl implements HabitService {
 
     private final HabitRepository habitRepository;
-    private final UserRepository userRepository;
     private final HabitMapper habitMapper;
     private final HabitCustomRepository habitCustomRepository;
+    private final EntityManager entityManager;
+
+//    @Override
+//    public HabitResponse createHabit(Long userId, HabitRequest habitRequest) {
+//        User user = userRepository.findByEmail(userId)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        Habit habit = habitMapper.toEntity(habitRequest);
+//        habit.setUser(user);
+//
+//        Habit savedHabit = habitRepository.save(habit);
+//        return habitMapper.toDto(savedHabit);
+//    }
 
     @Override
-    public HabitResponse createHabit(String userEmail, HabitRequest habitRequest) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public HabitResponse createHabit(Long userId, HabitRequest habitRequest) {
+        User userRef = entityManager.getReference(User.class, userId); // no DB hit
 
         Habit habit = habitMapper.toEntity(habitRequest);
-        habit.setUser(user);
+        habit.setUser(userRef);
 
         Habit savedHabit = habitRepository.save(habit);
         return habitMapper.toDto(savedHabit);
     }
+
 
 
     @Override
@@ -52,11 +65,6 @@ public class HabitServiceImpl implements HabitService {
                     return true;
                 })
                 .orElse(false);
-    }
-
-    @Override
-    public List<HabitResponse> getHabitsByUserId(Long userId) {
-        return habitCustomRepository.findHabitResponsesByUserId(userId);
     }
 
     @Override

@@ -7,8 +7,4 @@ import java.util.List;
 
 public interface HabitLogService {
     HabitLogResponse updateHabitLog(HabitLogRequest request);
-
-    List<HabitLogResponse> getLogsByHabit(Long habitId);
-
-    List<HabitLogResponse> getLogsByUserId(Long userId);
 }
