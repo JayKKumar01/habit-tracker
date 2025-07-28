@@ -55,6 +55,30 @@ public class HabitCustomRepositoryImpl implements HabitCustomRepository{
 
     @Override
     public List<HabitLogResponse> findHabitLogResponsesByUserId(Long userId) {
-        return List.of();
+        String sql = """
+        SELECT hl.habit_id, hl.date, hl.completed
+        FROM habit_logs hl
+        JOIN habits h ON hl.habit_id = h.id
+        WHERE h.user_id = :userId
+        ORDER BY hl.date DESC
+    """;
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = entityManager.createNativeQuery(sql)
+                .setParameter("userId", userId)
+                .getResultList();
+
+        List<HabitLogResponse> result = new ArrayList<>();
+        for (Object[] row : rows) {
+            HabitLogResponse dto = HabitLogResponse.builder()
+                    .habitId(((Number) row[0]).longValue())
+                    .date(((java.sql.Date) row[1]).toLocalDate())
+                    .completed((Boolean) row[2])
+                    .build();
+            result.add(dto);
+        }
+
+        return result;
     }
+
 }

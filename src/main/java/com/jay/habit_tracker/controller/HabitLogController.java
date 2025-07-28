@@ -57,32 +57,32 @@ public class HabitLogController {
         return ResponseEntity.ok(habitLogs);
     }
 
-    // ✅ NEW: Get all logs for a user (used to batch fetch logs for all habits)
-    @GetMapping("/all/{email}")
-    public ResponseEntity<?> getAllLogsForUser(
-            @PathVariable String email,
-            HttpServletRequest request
-    ) {
-        String tokenEmail = extractTokenEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
-
-        List<HabitLogResponse> userLogs = habitLogService.getAllLogsForUser(email);
-        return ResponseEntity.ok(userLogs);
-    }
-
-    // ✅ NEW: Get all logs for a user (used to batch fetch logs for all habits)
-//    @GetMapping("/all/{userId}")
-//    public ResponseEntity<?> getAllLogsForUserId(@PathVariable Long userId, HttpServletRequest request) {
-//        Long tokenUserId = extractTokenUserId(request);
-//        if (tokenUserId == null || !tokenUserId.equals(userId)) {
+//    // ✅ NEW: Get all logs for a user (used to batch fetch logs for all habits)
+//    @GetMapping("/all/{email}")
+//    public ResponseEntity<?> getAllLogsForUser(
+//            @PathVariable String email,
+//            HttpServletRequest request
+//    ) {
+//        String tokenEmail = extractTokenEmail(request);
+//        if (tokenEmail == null || !tokenEmail.equals(email)) {
 //            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
 //        }
 //
-//        List<HabitLogResponse> userLogs = habitLogService.getAllLogsForUserId(userId);
+//        List<HabitLogResponse> userLogs = habitLogService.getAllLogsForUser(email);
 //        return ResponseEntity.ok(userLogs);
 //    }
+
+//     ✅ NEW: Get all logs for a user (used to batch fetch logs for all habits)
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<?> getAllLogsForUserId(@PathVariable Long userId, HttpServletRequest request) {
+        Long tokenUserId = extractTokenUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+
+        List<HabitLogResponse> userLogs = habitLogService.getAllLogsForUserId(userId);
+        return ResponseEntity.ok(userLogs);
+    }
 
     // ✅ Reuse token-email extraction
     private String extractTokenEmail(HttpServletRequest request) {
