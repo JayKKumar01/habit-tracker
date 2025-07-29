@@ -1,6 +1,7 @@
 package com.jay.habit_tracker.repository;
 
 import com.jay.habit_tracker.entity.Habit;
+import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.projection_debug.HabitProjectionDebug;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,6 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
     GROUP BY h.id
 """, nativeQuery = true)
     List<HabitProjectionDebug> getAllProjectedHabits();
+
+    List<Habit> findByFrequency(Frequency frequency);
 }

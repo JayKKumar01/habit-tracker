@@ -21,4 +21,6 @@ public interface HabitTagRepository extends JpaRepository<Tag, Long> {
 
 
     List<Tag> findByNameIn(Set<String> requestedTagNames);
+
+    List<Tag> findByIdNotIn(List<Long> idsToKeep);
 }

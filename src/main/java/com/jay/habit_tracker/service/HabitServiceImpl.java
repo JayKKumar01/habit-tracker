@@ -39,11 +39,7 @@ public class HabitServiceImpl implements HabitService {
         Habit habit = habitMapper.toEntity(habitRequest);
         habit.setUser(userRef);
 
-        // Ensure tags set is initialized
-        if (habit.getTags() == null) {
-            habit.setTags(new HashSet<>());
-        }
-        habit.getTags().add(frequencyTag); // Add frequency tag
+        habit.setTags(new HashSet<>(Collections.singleton(frequencyTag)));
 
         habit = habitRepository.save(habit);
 
@@ -134,20 +130,24 @@ public class HabitServiceImpl implements HabitService {
                 habitMap.put(habitId, habit);
 
                 // ✅ Parse and attach tags
+                Object tagIdObj = row[9];
+                Object tagNameObj = row[10];
+                if (tagIdObj != null && tagNameObj != null) {
 
-                String[] tagIds = ((String) row[9]).split(",");
-                String[] tagNames = ((String) row[10]).split(",");
+                    String[] tagIds = ((String) tagIdObj).split(",");
+                    String[] tagNames = ((String) tagNameObj).split(",");
 
-                List<HabitTagDto> tagDtos = new ArrayList<>(tagIds.length);
-                for (int i = 0; i < tagIds.length; i++) {
-                    tagDtos.add(HabitTagDto.builder()
-                            .id(Long.parseLong(tagIds[i].trim()))
-                            .name(tagNames[i].trim())
-                            .habitId(habitId)
-                            .build());
+                    List<HabitTagDto> tagDtos = new ArrayList<>(tagIds.length);
+                    for (int i = 0; i < tagIds.length; i++) {
+                        tagDtos.add(HabitTagDto.builder()
+                                .id(Long.parseLong(tagIds[i].trim()))
+                                .name(tagNames[i].trim())
+                                .habitId(habitId)
+                                .build());
+                    }
+
+                    habit.setTags(tagDtos);
                 }
-
-                habit.setTags(tagDtos);
 
             }
 

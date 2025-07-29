@@ -10,6 +10,7 @@ import com.jay.habit_tracker.service.HabitTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 import java.time.LocalDate;
@@ -28,6 +29,65 @@ public class MasterController {
     private final PasswordEncoder passwordEncoder;
     private final HabitService habitService;
     private final HabitTagService habitTagService;
+
+    @DeleteMapping("/delete-users-except")
+    public ResponseEntity<String> deleteAllUsersExcept(@RequestBody List<String> emailsToKeep) {
+        List<User> usersToDelete = userRepository.findByEmailNotIn(emailsToKeep);
+        for (User user: usersToDelete){
+            System.out.println(user.getEmail()+", "+user.getName());
+        }
+        userRepository.deleteAll(usersToDelete);
+        return ResponseEntity.ok("Deleted " + usersToDelete.size() + " users successfully.");
+    }
+
+    @PutMapping("/map-frequency-tags")
+    @Transactional
+    public ResponseEntity<String> mapTagsToHabitsByFrequency() {
+        // Step 1: Fetch required tags by ID
+        Tag dailyTag = habitTagRepository.findById(1L).orElseThrow(() ->
+                new RuntimeException("Tag with ID 1 (DAILY) not found"));
+        Tag weeklyTag = habitTagRepository.findById(3L).orElseThrow(() ->
+                new RuntimeException("Tag with ID 3 (WEEKLY) not found"));
+
+        // Step 2: Fetch habits by frequency
+        List<Habit> dailyHabits = habitRepository.findByFrequency(Frequency.DAILY);
+        List<Habit> weeklyHabits = habitRepository.findByFrequency(Frequency.WEEKLY);
+
+        // Step 3: Assign tags if not already present
+        int count = 0;
+        for (Habit habit : dailyHabits) {
+            if (!habit.getTags().contains(dailyTag)) {
+                habit.getTags().add(dailyTag);
+                count++;
+            }
+        }
+        for (Habit habit : weeklyHabits) {
+            if (!habit.getTags().contains(weeklyTag)) {
+                habit.getTags().add(weeklyTag);
+                count++;
+            }
+        }
+
+        return ResponseEntity.ok("Mapped frequency tags to " + count + " habits.");
+    }
+
+    @DeleteMapping("/delete-tags-except")
+    @Transactional
+    public ResponseEntity<String> deleteTagsExcept(@RequestBody List<Long> idsToKeep) {
+        List<Tag> tagsToDelete = habitTagRepository.findByIdNotIn(idsToKeep);
+
+        for (Tag tag : tagsToDelete) {
+            // Unlink tag from all associated habits
+            for (Habit habit : tag.getHabits()) {
+                habit.getTags().remove(tag);
+            }
+            tag.getHabits().clear(); // Optional: make sure all links are broken
+        }
+
+        habitTagRepository.deleteAll(tagsToDelete);
+        return ResponseEntity.ok("Deleted " + tagsToDelete.size() + " tags successfully.");
+    }
+
 
 
     @PostMapping("/create-default-tags")
@@ -123,12 +183,7 @@ public class MasterController {
     }
 
 
-    @DeleteMapping("/delete-users-except")
-    public ResponseEntity<String> deleteAllUsersExcept(@RequestBody List<String> emailsToKeep) {
-        List<User> usersToDelete = userRepository.findByEmailNotIn(emailsToKeep);
-        userRepository.deleteAll(usersToDelete);
-        return ResponseEntity.ok("Deleted " + usersToDelete.size() + " users successfully.");
-    }
+
 
     @GetMapping("/debug/native-view")
     public ResponseEntity<String> viewDbUsingProjections() {
