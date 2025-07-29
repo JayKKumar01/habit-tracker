@@ -41,9 +41,9 @@ public class HabitServiceImpl implements HabitService {
 
         habit.setTags(new HashSet<>(Collections.singleton(frequencyTag)));
 
-        habit = habitRepository.save(habit);
+        Habit savedHabit = habitRepository.save(habit);
 
-        return habitMapper.toDto(habit);
+        return habitMapper.toDto(savedHabit);
     }
 
 

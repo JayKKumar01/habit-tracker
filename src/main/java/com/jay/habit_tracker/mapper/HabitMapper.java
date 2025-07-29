@@ -14,6 +14,7 @@ import java.util.HashSet;
 public interface HabitMapper {
 
     @Mapping(source = "targetDays", target = "targetDays")
+    @Mapping(source = "tags", target = "tags")
     HabitResponse toDto(Habit habit);
 
     @Mapping(target = "id", ignore = true)
