@@ -4,7 +4,6 @@ import com.jay.habit_tracker.enums.Frequency;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
@@ -67,6 +66,6 @@ public class Habit {
             joinColumns = @JoinColumn(name = "habit_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private Set<HabitTag> tags = new HashSet<>();
+    private Set<Tag> tags = new HashSet<>();
 
 }

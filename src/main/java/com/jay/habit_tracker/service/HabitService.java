@@ -7,7 +7,7 @@ import java.util.List;
 public interface HabitService {
     HabitResponse createHabit(Long userId, HabitRequest habitRequest);
     HabitUpdateDto updateHabit(HabitUpdateDto updateDto);
-    List<HabitWithLogsResponse> getHabitWithLogsByUserId(Long userId);
+    List<HabitEntitiesResponse> getHabitWithEntitiesByUserId(Long userId);
     boolean deleteHabit(Long habitId);
 
 }

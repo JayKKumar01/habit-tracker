@@ -1,9 +1,10 @@
 package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.habit.*;
-import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
+import com.jay.habit_tracker.dto.habit_log.HabitLogDto;
+import com.jay.habit_tracker.dto.tag.HabitTagDto;
 import com.jay.habit_tracker.entity.Habit;
-import com.jay.habit_tracker.entity.HabitTag;
+import com.jay.habit_tracker.entity.Tag;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.mapper.HabitMapper;
@@ -12,16 +13,12 @@ import com.jay.habit_tracker.repository.HabitTagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +33,7 @@ public class HabitServiceImpl implements HabitService {
     @Transactional
     public HabitResponse createHabit(Long userId, HabitRequest habitRequest) {
         User userRef = entityManager.getReference(User.class, userId);
-        HabitTag frequencyTag = entityManager.getReference(HabitTag.class,
+        Tag frequencyTag = entityManager.getReference(Tag.class,
                 habitRequest.getFrequency() == Frequency.DAILY ? 1L : 3L);
 
         Habit habit = habitMapper.toEntity(habitRequest);
@@ -52,8 +49,6 @@ public class HabitServiceImpl implements HabitService {
 
         return habitMapper.toDto(habit);
     }
-
-
 
 
     @Override
@@ -82,34 +77,39 @@ public class HabitServiceImpl implements HabitService {
     }
 
     @Override
-    public List<HabitWithLogsResponse> getHabitWithLogsByUserId(Long userId) {
+    public List<HabitEntitiesResponse> getHabitWithEntitiesByUserId(Long userId) {
         String sql = """
-        SELECT h.id, h.title, h.description, h.frequency,
-               GROUP_CONCAT(DISTINCT htds.target_day) AS target_days,
-               h.start_date, h.end_date,
-               hl.date AS log_date, hl.completed AS log_completed
-        FROM habits h
-        LEFT JOIN habit_target_day_strings htds ON h.id = htds.habit_id
-        LEFT JOIN habit_logs hl ON hl.habit_id = h.id
-        WHERE h.user_id = :userId
-        GROUP BY h.id, hl.date, hl.completed
-        ORDER BY h.id, hl.date DESC
-    """;
+    SELECT h.id, h.title, h.description, h.frequency,
+           GROUP_CONCAT(DISTINCT htds.target_day) AS target_days,
+           h.start_date, h.end_date,
+           hl.date AS log_date, hl.completed AS log_completed,
+           GROUP_CONCAT(DISTINCT ht.id) AS tag_ids,
+           GROUP_CONCAT(DISTINCT ht.name) AS tag_names
+    FROM habits h
+    LEFT JOIN habit_target_day_strings htds ON h.id = htds.habit_id
+    LEFT JOIN habit_logs hl ON hl.habit_id = h.id
+    LEFT JOIN habit_tag_mapping htm ON h.id = htm.habit_id
+    LEFT JOIN habit_tags ht ON ht.id = htm.tag_id
+    WHERE h.user_id = :userId
+    GROUP BY h.id, hl.date, hl.completed
+    ORDER BY h.id, hl.date DESC
+""";
+
+
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = entityManager.createNativeQuery(sql)
                 .setParameter("userId", userId)
                 .getResultList();
 
-        Map<Long, HabitWithLogsResponse> habitMap = new LinkedHashMap<>();
+        Map<Long, HabitEntitiesResponse> habitMap = new LinkedHashMap<>();
 
         for (Object[] row : rows) {
             Long habitId = ((Number) row[0]).longValue();
             String targetDaysRaw = (String) row[4];
 
-            HabitWithLogsResponse habit = habitMap.get(habitId);
+            HabitEntitiesResponse habit = habitMap.get(habitId);
             if (habit == null) {
-                // ✅ Convert comma-separated string into EnumSet<DayOfWeek>
                 Set<DayOfWeek> targetDays = (targetDaysRaw == null || targetDaysRaw.isBlank())
                         ? EnumSet.noneOf(DayOfWeek.class)
                         : EnumSet.copyOf(
@@ -119,7 +119,7 @@ public class HabitServiceImpl implements HabitService {
                                 .collect(Collectors.toSet())
                 );
 
-                habit = HabitWithLogsResponse.builder()
+                habit = HabitEntitiesResponse.builder()
                         .id(habitId)
                         .title((String) row[1])
                         .description((String) row[2])
@@ -127,19 +127,35 @@ public class HabitServiceImpl implements HabitService {
                         .targetDays(targetDays)
                         .startDate(((java.sql.Date) row[5]).toLocalDate())
                         .endDate(row[6] == null ? null : ((java.sql.Date) row[6]).toLocalDate())
+                        .logs(new ArrayList<>())
+                        .tags(new ArrayList<>())
                         .build();
 
                 habitMap.put(habitId, habit);
+
+                // ✅ Parse and attach tags
+
+                String[] tagIds = ((String) row[9]).split(",");
+                String[] tagNames = ((String) row[10]).split(",");
+
+                List<HabitTagDto> tagDtos = new ArrayList<>(tagIds.length);
+                for (int i = 0; i < tagIds.length; i++) {
+                    tagDtos.add(HabitTagDto.builder()
+                            .id(Long.parseLong(tagIds[i].trim()))
+                            .name(tagNames[i].trim())
+                            .habitId(habitId)
+                            .build());
+                }
+
+                habit.setTags(tagDtos);
+
             }
 
             Object logDateObj = row[7];
             Object completedObj = row[8];
 
             if (logDateObj != null && completedObj != null) {
-                if (habit.getLogs() == null)
-                    habit.setLogs(new ArrayList<>());
-
-                habit.getLogs().add(HabitLogUpdateDto.builder()
+                habit.getLogs().add(HabitLogDto.builder()
                         .habitId(habitId)
                         .date(((java.sql.Date) logDateObj).toLocalDate())
                         .completed((Boolean) completedObj)
@@ -149,13 +165,19 @@ public class HabitServiceImpl implements HabitService {
 
 // Optional: Trim memory usage
         habitMap.values().forEach(habit -> {
-            List<HabitLogUpdateDto> logs = habit.getLogs();
+            List<HabitLogDto> logs = habit.getLogs();
             if (logs instanceof ArrayList<?>) {
                 ((ArrayList<?>) logs).trimToSize();
+            }
+
+            List<HabitTagDto> tags = habit.getTags();
+            if (tags instanceof ArrayList<?>) {
+                ((ArrayList<?>) tags).trimToSize();
             }
         });
 
         return new ArrayList<>(habitMap.values());
+
     }
 
     @Override
@@ -167,10 +189,6 @@ public class HabitServiceImpl implements HabitService {
                 })
                 .orElse(false);
     }
-
-
-
-
 
 
 }

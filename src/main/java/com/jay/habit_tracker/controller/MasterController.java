@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.controller;
 import com.jay.habit_tracker.dto.habit.HabitRequest;
 import com.jay.habit_tracker.dto.habit.HabitResponse;
-import com.jay.habit_tracker.dto.habit_tag.HabitTagDto;
+import com.jay.habit_tracker.dto.tag.HabitTagDto;
 import com.jay.habit_tracker.entity.*;
 import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.repository.*;
@@ -43,9 +43,9 @@ public class MasterController {
         for (String tagName : defaultTagNames) {
             String normalizedTag = tagName.trim().toLowerCase();
 
-            HabitTag tag = habitTagRepository.findByName(normalizedTag)
+            Tag tag = habitTagRepository.findByName(normalizedTag)
                     .orElseGet(() -> habitTagRepository.save(
-                            HabitTag.builder().name(normalizedTag).build()
+                            Tag.builder().name(normalizedTag).build()
                     ));
 
             tagIds.add(tag.getId());

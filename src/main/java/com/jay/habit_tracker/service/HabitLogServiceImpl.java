@@ -1,6 +1,6 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.habit_log.HabitLogUpdateDto;
+import com.jay.habit_tracker.dto.habit_log.HabitLogDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class HabitLogServiceImpl implements HabitLogService {
 
     @Override
     @Transactional
-    public HabitLogUpdateDto updateHabitLog(HabitLogUpdateDto updateDto) {
+    public HabitLogDto updateHabitLog(HabitLogDto updateDto) {
         String sql = """
             INSERT INTO habit_logs (habit_id, date, completed)
             VALUES (:habitId, :date, :completed)

@@ -52,7 +52,7 @@ public class HabitController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        List<HabitWithLogsResponse> habits = habitService.getHabitWithLogsByUserId(userId);
+        List<HabitEntitiesResponse> habits = habitService.getHabitWithEntitiesByUserId(userId);
         return ResponseEntity.ok(habits);
     }
 

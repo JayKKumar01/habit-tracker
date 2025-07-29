@@ -1,8 +1,8 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.habit_tag.HabitTagDto;
+import com.jay.habit_tracker.dto.tag.HabitTagDto;
 import com.jay.habit_tracker.entity.Habit;
-import com.jay.habit_tracker.entity.HabitTag;
+import com.jay.habit_tracker.entity.Tag;
 import com.jay.habit_tracker.repository.HabitRepository;
 import com.jay.habit_tracker.repository.HabitTagRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,8 @@ public class HabitTagServiceImpl implements HabitTagService {
 
         String normalizedTag = tagName.trim().toLowerCase();
 
-        HabitTag tag = habitTagRepository.findByName(normalizedTag)
-                .orElseGet(() -> habitTagRepository.save(HabitTag.builder().name(normalizedTag).build()));
+        Tag tag = habitTagRepository.findByName(normalizedTag)
+                .orElseGet(() -> habitTagRepository.save(Tag.builder().name(normalizedTag).build()));
 
         if (habit.getTags().contains(tag)) {
             return null;

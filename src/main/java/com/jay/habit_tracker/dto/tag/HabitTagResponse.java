@@ -1,4 +1,4 @@
-package com.jay.habit_tracker.dto.habit_tag;
+package com.jay.habit_tracker.dto.tag;
 
 import lombok.*;
 
@@ -7,8 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitTagDto {
+public class HabitTagResponse {
     private Long id;
     private String name;
-    private Long habitId;
 }
