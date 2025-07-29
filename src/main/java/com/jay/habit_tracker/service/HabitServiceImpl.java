@@ -35,117 +35,23 @@ public class HabitServiceImpl implements HabitService {
     @Override
     @Transactional
     public HabitResponse createHabit(Long userId, HabitRequest habitRequest) {
-        Long habitId = insertHabit(userId, habitRequest);
+        User userRef = entityManager.getReference(User.class, userId);
+        HabitTag frequencyTag = entityManager.getReference(HabitTag.class,
+                habitRequest.getFrequency() == Frequency.DAILY ? 1L : 3L);
 
-        attachFrequencyTag(habitId, habitRequest.getFrequency());
+        Habit habit = habitMapper.toEntity(habitRequest);
+        habit.setUser(userRef);
 
-        Set<String> tagNames = habitRequest.getTags();
-        if (tagNames != null && !tagNames.isEmpty()) {
-            insertTagsIfAbsent(tagNames);
-            List<Long> tagIds = fetchTagIds(tagNames);
-            mapTagsToHabit(habitId, tagIds);
+        // Ensure tags set is initialized
+        if (habit.getTags() == null) {
+            habit.setTags(new HashSet<>());
         }
+        habit.getTags().add(frequencyTag); // Add frequency tag
 
-        return new HabitResponse(
-                habitId,
-                habitRequest.getTitle(),
-                habitRequest.getDescription(),
-                habitRequest.getFrequency(),
-                habitRequest.getTargetDays().stream()
-                        .map(String::toUpperCase)
-                        .map(DayOfWeek::valueOf)
-                        .collect(Collectors.toCollection(() -> EnumSet.noneOf(DayOfWeek.class))),
-                habitRequest.getStartDate()
-        );
+        habit = habitRepository.save(habit);
 
+        return habitMapper.toDto(habit);
     }
-
-    private Long insertHabit(Long userId, HabitRequest req) {
-        entityManager.createNativeQuery("""
-        INSERT INTO habits (user_id, title, description, frequency, start_date, created_at, updated_at)
-        VALUES (:userId, :title, :description, :frequency, :startDate, NOW(), NOW())
-    """)
-                .setParameter("userId", userId)
-                .setParameter("title", req.getTitle())
-                .setParameter("description", req.getDescription())
-                .setParameter("frequency", req.getFrequency().name())
-                .setParameter("startDate", req.getStartDate())
-                .executeUpdate();
-
-        BigInteger id = (BigInteger) entityManager
-                .createNativeQuery("SELECT LAST_INSERT_ID()")
-                .getSingleResult();
-
-        insertTargetDays(id.longValue(), req.getTargetDays());
-
-        return id.longValue();
-    }
-
-    private void insertTargetDays(Long habitId, Set<String> days) {
-        if (days == null || days.isEmpty()) return;
-
-        for (String day : days) {
-            entityManager.createNativeQuery("""
-            INSERT INTO habit_target_days (habit_id, day_of_week)
-            VALUES (:habitId, :day)
-        """)
-                    .setParameter("habitId", habitId)
-                    .setParameter("day", day)
-                    .executeUpdate();
-        }
-    }
-
-    private void attachFrequencyTag(Long habitId, Frequency frequency) {
-        Long freqTagId = (frequency == Frequency.DAILY) ? 1L : 3L;
-        entityManager.createNativeQuery("""
-        INSERT INTO habit_tag_mapping (habit_id, tag_id)
-        VALUES (:habitId, :tagId)
-    """)
-                .setParameter("habitId", habitId)
-                .setParameter("tagId", freqTagId)
-                .executeUpdate();
-    }
-
-    private void insertTagsIfAbsent(Set<String> tagNames) {
-        for (String name : tagNames) {
-            entityManager.createNativeQuery("""
-            INSERT INTO habit_tags (name)
-            VALUES (:name)
-            ON DUPLICATE KEY UPDATE name = name
-        """)
-                    .setParameter("name", name)
-                    .executeUpdate();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<Long> fetchTagIds(Set<String> tagNames) {
-        return ((List<Number>) entityManager.createNativeQuery("""
-        SELECT id FROM habit_tags WHERE name IN :names
-    """)
-                .setParameter("names", tagNames)
-                .getResultList())
-                .stream()
-                .map(Number::longValue)
-                .toList();
-    }
-
-    private void mapTagsToHabit(Long habitId, List<Long> tagIds) {
-        for (Long tagId : tagIds) {
-            entityManager.createNativeQuery("""
-            INSERT INTO habit_tag_mapping (habit_id, tag_id)
-            VALUES (:habitId, :tagId)
-        """)
-                    .setParameter("habitId", habitId)
-                    .setParameter("tagId", tagId)
-                    .executeUpdate();
-        }
-    }
-
-
-
-
-
 
 
 

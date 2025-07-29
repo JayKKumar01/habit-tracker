@@ -17,5 +17,4 @@ public class HabitRequest {
     private Frequency frequency;
     private Set<String> targetDays;
     private LocalDate startDate;
-    private Set<String> tags;
 }
