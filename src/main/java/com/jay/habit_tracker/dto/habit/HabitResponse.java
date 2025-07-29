@@ -1,5 +1,6 @@
 package com.jay.habit_tracker.dto.habit;
 
+import com.jay.habit_tracker.entity.Tag;
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
 
