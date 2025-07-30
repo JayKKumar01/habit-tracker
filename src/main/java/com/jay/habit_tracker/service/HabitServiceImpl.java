@@ -47,7 +47,7 @@ public class HabitServiceImpl implements HabitService {
 
     @Override
     @Transactional
-    public HabitUpdateDto updateHabit(HabitUpdateDto updateDto) {
+    public HabitUpdate updateHabit(HabitUpdate updateDto) {
         StringBuilder sql = new StringBuilder("UPDATE habits SET title = :title, description = :description");
 
         if (updateDto.getEndDate() != null) {
@@ -71,7 +71,7 @@ public class HabitServiceImpl implements HabitService {
     }
 
     @Override
-    public List<HabitEntitiesResponse> getHabitWithEntitiesByUserId(Long userId) {
+    public List<HabitResponse> getHabitsByUserId(Long userId) {
         String sql = """
     SELECT h.id, h.title, h.description, h.frequency,
            GROUP_CONCAT(DISTINCT htds.target_day) AS target_days,
@@ -96,13 +96,13 @@ public class HabitServiceImpl implements HabitService {
                 .setParameter("userId", userId)
                 .getResultList();
 
-        Map<Long, HabitEntitiesResponse> habitMap = new LinkedHashMap<>();
+        Map<Long, HabitResponse> habitMap = new LinkedHashMap<>();
 
         for (Object[] row : rows) {
             Long habitId = ((Number) row[0]).longValue();
             String targetDaysRaw = (String) row[4];
 
-            HabitEntitiesResponse habit = habitMap.get(habitId);
+            HabitResponse habit = habitMap.get(habitId);
             if (habit == null) {
                 Set<DayOfWeek> targetDays = (targetDaysRaw == null || targetDaysRaw.isBlank())
                         ? EnumSet.noneOf(DayOfWeek.class)
@@ -113,7 +113,7 @@ public class HabitServiceImpl implements HabitService {
                                 .collect(Collectors.toSet())
                 );
 
-                habit = HabitEntitiesResponse.builder()
+                habit = HabitResponse.builder()
                         .id(habitId)
                         .title((String) row[1])
                         .description((String) row[2])

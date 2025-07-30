@@ -33,26 +33,26 @@ public class HabitController {
 
     // ✅ Edit habit (secured)
     @PutMapping("/edit/{userId}")
-    public ResponseEntity<?> updateHabit(@PathVariable Long userId, @RequestBody HabitUpdateDto editRequest, HttpServletRequest request) {
+    public ResponseEntity<?> updateHabit(@PathVariable Long userId, @RequestBody HabitUpdate editRequest, HttpServletRequest request) {
         Long tokenUserId = jwtUtil.extractUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        HabitUpdateDto updated = habitService.updateHabit(editRequest);
+        HabitUpdate updated = habitService.updateHabit(editRequest);
         return ResponseEntity.ok(updated); // 200 OK for updates
     }
 
 
 
-    @GetMapping("/habitsAndLogs/{userId}")
-    public ResponseEntity<?> getHabitWithLogsByUserId(@PathVariable Long userId, HttpServletRequest request) {
+    @GetMapping("/habits/{userId}")
+    public ResponseEntity<?> getHabitsByUserId(@PathVariable Long userId, HttpServletRequest request) {
         Long tokenUserId = jwtUtil.extractUserId(request);
         if (tokenUserId == null || !tokenUserId.equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
         }
 
-        List<HabitEntitiesResponse> habits = habitService.getHabitWithEntitiesByUserId(userId);
+        List<HabitResponse> habits = habitService.getHabitsByUserId(userId);
         return ResponseEntity.ok(habits);
     }
 

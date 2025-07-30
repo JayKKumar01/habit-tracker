@@ -5,5 +5,4 @@ import com.jay.habit_tracker.dto.user.UserResponse;
 
 public interface UserService {
     UserResponse getUserByEmail(String email);
-    boolean deleteUserByEmail(String email);
 }

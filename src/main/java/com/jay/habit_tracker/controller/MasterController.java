@@ -1,257 +1,118 @@
 package com.jay.habit_tracker.controller;
-import com.jay.habit_tracker.dto.habit.HabitRequest;
-import com.jay.habit_tracker.dto.habit.HabitResponse;
-import com.jay.habit_tracker.dto.tag.TagDto;
-import com.jay.habit_tracker.entity.*;
-import com.jay.habit_tracker.enums.Frequency;
-import com.jay.habit_tracker.repository.*;
-import com.jay.habit_tracker.service.HabitService;
-import com.jay.habit_tracker.service.TagService;
+
+import com.jay.habit_tracker.entity.User;
+import com.jay.habit_tracker.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
-import java.time.LocalDate;
-import java.util.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/master")
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class MasterController {
 
     private final UserRepository userRepository;
-    private final HabitRepository habitRepository;
-    private final HabitLogRepository habitLogRepository;
-    private final ProfileRepository profileRepository;
-    private final TagRepository tagRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final HabitService habitService;
-    private final TagService tagService;
 
+    @PersistenceContext
+    private final EntityManager entityManager;
+
+    /**
+     * Delete all users except the ones whose emails are passed in the request body.
+     */
     @DeleteMapping("/delete-users-except")
     public ResponseEntity<String> deleteAllUsersExcept(@RequestBody List<String> emailsToKeep) {
-        List<User> usersToDelete = userRepository.findByEmailNotIn(emailsToKeep);
-        for (User user: usersToDelete){
-            System.out.println(user.getEmail()+", "+user.getName());
+        if (emailsToKeep == null || emailsToKeep.isEmpty()) {
+            return ResponseEntity.badRequest().body("emailsToKeep list cannot be empty.");
         }
+
+        // Step 1: Fetch users to delete using native query
+        String inClause = String.join(",", emailsToKeep.stream().map(email -> "'" + email + "'").toList());
+
+        String sql = "SELECT * FROM users WHERE email NOT IN (" + inClause + ")";
+        List<User> usersToDelete = entityManager.createNativeQuery(sql, User.class).getResultList();
+
+        // Step 2: Log (optional)
+        for (User user : usersToDelete) {
+            System.out.println("Deleting user: " + user.getEmail() + " - " + user.getName());
+        }
+
+        // Step 3: Delete them using repository
         userRepository.deleteAll(usersToDelete);
+
         return ResponseEntity.ok("Deleted " + usersToDelete.size() + " users successfully.");
     }
 
-    @PutMapping("/map-frequency-tags")
-    @Transactional
-    public ResponseEntity<String> mapTagsToHabitsByFrequency() {
-        // Step 1: Fetch required tags by ID
-        Tag dailyTag = tagRepository.findById(1L).orElseThrow(() ->
-                new RuntimeException("Tag with ID 1 (DAILY) not found"));
-        Tag weeklyTag = tagRepository.findById(3L).orElseThrow(() ->
-                new RuntimeException("Tag with ID 3 (WEEKLY) not found"));
 
-        // Step 2: Fetch habits by frequency
-        List<Habit> dailyHabits = habitRepository.findByFrequency(Frequency.DAILY);
-        List<Habit> weeklyHabits = habitRepository.findByFrequency(Frequency.WEEKLY);
-
-        // Step 3: Assign tags if not already present
-        int count = 0;
-        for (Habit habit : dailyHabits) {
-            if (!habit.getTags().contains(dailyTag)) {
-                habit.getTags().add(dailyTag);
-                count++;
-            }
-        }
-        for (Habit habit : weeklyHabits) {
-            if (!habit.getTags().contains(weeklyTag)) {
-                habit.getTags().add(weeklyTag);
-                count++;
-            }
-        }
-
-        return ResponseEntity.ok("Mapped frequency tags to " + count + " habits.");
-    }
-
-    @DeleteMapping("/delete-tags-except")
-    @Transactional
-    public ResponseEntity<String> deleteTagsExcept(@RequestBody List<Long> idsToKeep) {
-        List<Tag> tagsToDelete = tagRepository.findByIdNotIn(idsToKeep);
-
-        for (Tag tag : tagsToDelete) {
-            // Unlink tag from all associated habits
-            for (Habit habit : tag.getHabits()) {
-                habit.getTags().remove(tag);
-            }
-            tag.getHabits().clear(); // Optional: make sure all links are broken
-        }
-
-        tagRepository.deleteAll(tagsToDelete);
-        return ResponseEntity.ok("Deleted " + tagsToDelete.size() + " tags successfully.");
-    }
-
-
-
-    @PostMapping("/create-default-tags")
-    public ResponseEntity<List<Long>> createDefaultTags() {
-        List<String> defaultTagNames = List.of(
-                "Daily", "Weekly", "Morning", "Evening", "Health",
-                "Fitness", "Work", "Meditation", "Study",
-                "Productivity", "Personal", "Finance"
-        );
-
-        List<Long> tagIds = new ArrayList<>();
-
-        for (String tagName : defaultTagNames) {
-            String normalizedTag = tagName.trim().toLowerCase();
-
-            Tag tag = tagRepository.findByName(normalizedTag)
-                    .orElseGet(() -> tagRepository.save(
-                            Tag.builder().name(normalizedTag).build()
-                    ));
-
-            tagIds.add(tag.getId());
-        }
-
-        return ResponseEntity.status(201).body(tagIds);
-    }
-
-
-    @PostMapping("/add-habit-tag/{habitId}")
-    public ResponseEntity<?> addTagToHabit(
-            @PathVariable Long habitId,
-            @RequestParam String tagName) {
-
-        TagDto habitTag = tagService.addHabitTag(habitId, tagName);
-
-        if (habitTag == null) {
-            return ResponseEntity
-                    .status(409)
-                    .body("Tag already exists for this habit.");
-        }
-
-        return ResponseEntity
-                .status(201)
-                .body(habitTag);
-    }
-
-
-
-
-    @PostMapping("/createHabit/{userId}/{count}")
-    public ResponseEntity<List<HabitResponse>> createHabitWithoutAuth(
-            @PathVariable Long userId,
-            @PathVariable int count) {
-
-        List<HabitResponse> createdHabits = new ArrayList<>();
-
-        for (int i = 1; i <= count; i++) {
-            System.out.println("Creating Habit #" + i);
-
-            HabitRequest requestDTO = new HabitRequest();
-            requestDTO.setTitle("Habit " + i);
-            requestDTO.setDescription("Description for Habit " + i);
-            requestDTO.setFrequency(Frequency.DAILY);
-            requestDTO.setTargetDays(Set.of(
-                    "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY",
-                    "FRIDAY", "SATURDAY", "SUNDAY"
-            ));
-            requestDTO.setStartDate(LocalDate.parse("2025-07-28"));
-
-            HabitResponse response = habitService.createHabit(userId, requestDTO);
-            createdHabits.add(response);
-        }
-
-        return ResponseEntity.status(201).body(createdHabits);
-    }
-
-    @PutMapping("/rehash-passwords")
-    public ResponseEntity<String> rehashAllPasswords() {
-        List<User> users = userRepository.findAll();
-        int count = 0;
-
-        for (User user : users) {
-            String currentPassword = user.getPassword();
-            // Skip already-hashed passwords
-            if (!currentPassword.startsWith("$2a$")) {
-                String hashed = passwordEncoder.encode(currentPassword);
-                user.setPassword(hashed);
-                count++;
-            }
-        }
-
-        userRepository.saveAll(users);
-        return ResponseEntity.ok("Rehashed passwords for " + count + " users.");
-    }
-
-
-
-
+    /**
+     * View all DB tables in HTML format using native queries.
+     */
     @GetMapping("/debug/native-view")
-    public ResponseEntity<String> viewDbUsingProjections() {
-        StringBuilder html = new StringBuilder("<html><body>");
+    public ResponseEntity<String> viewDbUsingNativeSQL() {
 
         // Users
-        html.append("<h2>Users</h2><table border='1'><tr><th>ID</th><th>Name</th><th>Email</th><th>Password</th><th>Created At</th></tr>");
-        userRepository.getAllProjectedUsers().forEach(u -> html.append("<tr>")
-                .append("<td>").append(u.getId()).append("</td>")
-                .append("<td>").append(htmlEscape(u.getName())).append("</td>")
-                .append("<td>").append(htmlEscape(u.getEmail())).append("</td>")
-                .append("<td>").append(htmlEscape(u.getPassword())).append("</td>")
-                .append("<td>").append(u.getCreatedAt()).append("</td>")
-                .append("</tr>"));
-        html.append("</table><br>");
 
-        // Profiles
-        html.append("<h2>Profiles</h2><table border='1'><tr><th>ID</th><th>Bio</th><th>User ID</th></tr>");
-        profileRepository.getAllProjectedProfiles().forEach(p -> html.append("<tr>")
-                .append("<td>").append(p.getId()).append("</td>")
-                .append("<td>").append(htmlEscape(p.getBio())).append("</td>")
-                .append("<td>").append(p.getUserId()).append("</td>")
-                .append("</tr>"));
-        html.append("</table><br>");
+        String html = "<html><body>" + buildTable("Users", "SELECT id, name, email, password, created_at FROM users",
+                "ID", "Name", "Email", "Password", "Created At") +
 
-        // Habits
-        html.append("<h2>Habits</h2><table border='1'><tr><th>ID</th><th>Title</th><th>Description</th><th>Frequency</th><th>Target Days</th><th>Start Date</th><th>End Date</th><th>Created At</th><th>User ID</th></tr>");
-        habitRepository.getAllProjectedHabits().forEach(h -> {
-            String targetDaysRaw = h.getTargetDays();
-            String convertedDays = htmlEscape(targetDaysRaw);
-            html.append("<tr>")
-                    .append("<td>").append(h.getId()).append("</td>")
-                    .append("<td>").append(htmlEscape(h.getTitle())).append("</td>")
-                    .append("<td>").append(htmlEscape(h.getDescription())).append("</td>")
-                    .append("<td>").append(htmlEscape(h.getFrequency())).append("</td>")
-                    .append("<td>").append(convertedDays).append("</td>")
-                    .append("<td>").append(h.getStartDate()).append("</td>")
-                    .append("<td>").append(h.getEndDate()).append("</td>")
-                    .append("<td>").append(h.getCreatedAt()).append("</td>")
-                    .append("<td>").append(h.getUserId()).append("</td>")
-                    .append("</tr>");
-        });
-        html.append("</table><br>");
+                // Profiles
+                buildTable("Profiles", "SELECT id, bio, user_id FROM profiles",
+                        "ID", "Bio", "User ID") +
 
-        // Habit Logs
-        html.append("<h2>Habit Logs</h2><table border='1'><tr><th>ID</th><th>Date</th><th>Completed</th><th>Habit ID</th></tr>");
-        habitLogRepository.getAllProjectedLogs().forEach(l -> html.append("<tr>")
-                .append("<td>").append(l.getId()).append("</td>")
-                .append("<td>").append(l.getDate()).append("</td>")
-                .append("<td>").append(l.getCompleted()).append("</td>")
-                .append("<td>").append(l.getHabitId()).append("</td>")
-                .append("</tr>"));
-        html.append("</table><br>");
+                // Habits (with target days)
+                buildTable("Habits", """
+                            SELECT h.id, h.title, h.description, h.frequency,
+                                   GROUP_CONCAT(htds.target_day ORDER BY htds.target_day SEPARATOR ', ') AS target_days,
+                                   h.start_date, h.end_date, h.created_at, h.user_id
+                            FROM habits h
+                            LEFT JOIN habit_target_day_strings htds ON h.id = htds.habit_id
+                            GROUP BY h.id, h.title, h.description, h.frequency, h.start_date, h.end_date, h.created_at, h.user_id
+                        """, "ID", "Title", "Description", "Frequency", "Target Days", "Start Date", "End Date", "Created At", "User ID") +
 
-        // Habit Tags
-        html.append("<h2>Habit Tags</h2><table border='1'><tr><th>Tag ID</th><th>Name</th><th>Habit ID</th></tr>");
-        tagRepository.getAllProjectedTags().forEach(tag -> html.append("<tr>")
-                .append("<td>").append(tag.getId()).append("</td>")
-                .append("<td>").append(htmlEscape(tag.getName())).append("</td>")
-                .append("<td>").append(tag.getHabitId()).append("</td>")
-                .append("</tr>"));
-        html.append("</table><br>");
+                // Habit Logs
+                buildTable("Habit Logs", "SELECT id, date, completed, habit_id FROM habit_logs",
+                        "ID", "Date", "Completed", "Habit ID") +
 
+                // Tags
+                buildTable("Tags", "SELECT id, name FROM habit_tags", "ID", "Name") +
 
-        html.append("</body></html>");
-        return ResponseEntity.ok().header("Content-Type", "text/html").body(html.toString());
+                // Habit-Tag Mapping
+                buildTable("Habit-Tag Mapping", "SELECT habit_id, tag_id FROM habit_tag_mapping",
+                        "Habit ID", "Tag ID") +
+                "</body></html>";
+        return ResponseEntity.ok().header("Content-Type", "text/html").body(html);
     }
 
+    /**
+     * Utility to build an HTML table for a given native SQL result.
+     */
+    private String buildTable(String title, String query, String... headers) {
+        StringBuilder table = new StringBuilder("<h2>").append(title).append("</h2>");
+        table.append("<table border='1'><tr>");
+        for (String header : headers) table.append("<th>").append(htmlEscape(header)).append("</th>");
+        table.append("</tr>");
+
+        List<Object[]> rows = entityManager.createNativeQuery(query).getResultList();
+        for (Object[] row : rows) {
+            table.append("<tr>");
+            for (Object col : row) {
+                table.append("<td>").append(htmlEscape(String.valueOf(col))).append("</td>");
+            }
+            table.append("</tr>");
+        }
+
+        table.append("</table><br>");
+        return table.toString();
+    }
+
+    /**
+     * Escapes HTML special characters.
+     */
     private String htmlEscape(String input) {
         return HtmlUtils.htmlEscape(input == null ? "" : input);
     }

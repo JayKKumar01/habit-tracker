@@ -32,19 +32,4 @@ public class UserController {
 
         return ResponseEntity.ok(userResponse);
     }
-
-    @DeleteMapping
-    public ResponseEntity<?> deleteUserByEmail(@RequestParam String email, HttpServletRequest request) {
-        String tokenEmail = jwtUtil.extractEmail(request);
-        if (tokenEmail == null || !tokenEmail.equals(email)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
-
-        boolean deleted = userService.deleteUserByEmail(email);
-        if (!deleted) {
-            return ResponseEntity.status(404).body(Map.of("message", "User with email " + email + " not found."));
-        }
-
-        return ResponseEntity.noContent().build();
-    }
 }

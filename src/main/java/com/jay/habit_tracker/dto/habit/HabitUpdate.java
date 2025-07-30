@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @ToString
-public class HabitUpdateDto {
+public class HabitUpdate {
     private Long habitId;
     private String title;
     private String description;
