@@ -1,8 +1,8 @@
 package com.jay.habit_tracker.service;
 
-import com.jay.habit_tracker.dto.profile.ProfileUpdateDto;
+import com.jay.habit_tracker.dto.profile.ProfileRequest;
+import com.jay.habit_tracker.dto.profile.ProfileResponse;
 import com.jay.habit_tracker.entity.Profile;
-import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.mapper.ProfileMapper;
 import com.jay.habit_tracker.repository.ProfileRepository;
 import com.jay.habit_tracker.repository.UserRepository;
@@ -23,7 +23,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public ProfileUpdateDto saveOrUpdate(Long userId, ProfileUpdateDto updateDto) {
+    public ProfileRequest saveOrUpdate(Long userId, ProfileRequest profileRequest) {
         // ✅ Upsert into profiles (bio)
         entityManager.createNativeQuery("""
         INSERT INTO profiles (user_id, bio)
@@ -31,7 +31,7 @@ public class ProfileServiceImpl implements ProfileService {
         ON DUPLICATE KEY UPDATE bio = :bio
     """)
                 .setParameter("userId", userId)
-                .setParameter("bio", updateDto.getBio())
+                .setParameter("bio", profileRequest.getBio())
                 .executeUpdate();
 
         // ✅ Update users (name)
@@ -40,24 +40,27 @@ public class ProfileServiceImpl implements ProfileService {
         SET name = :name
         WHERE id = :userId
     """)
-                .setParameter("name", updateDto.getName())
+                .setParameter("name", profileRequest.getName())
                 .setParameter("userId", userId)
                 .executeUpdate();
 
-        return updateDto;
+        return profileRequest;
     }
 
 
     @Override
-    public ProfileUpdateDto getProfile(Long userId) {
+    public ProfileResponse getProfile(Long userId) {
         Profile profile = entityManager.createQuery("""
             SELECT p FROM Profile p
             WHERE p.user.id = :userId
         """, Profile.class)
                 .setParameter("userId", userId)
-                .getSingleResult(); // ← This is correct for @OneToOne
+                .getResultList()
+                .stream()
+                .findFirst()
+                .orElse(null);
 
-        return profileMapper.toDto(profile);
+        return (profile == null) ? null : profileMapper.toDto(profile);
     }
 
 }
