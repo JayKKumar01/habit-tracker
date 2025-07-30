@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitTagAddRequest {
+public class TagAddRequest {
     private Long habitId;
     private String name;
 }

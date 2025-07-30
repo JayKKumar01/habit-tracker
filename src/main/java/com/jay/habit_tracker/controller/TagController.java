@@ -1,6 +1,7 @@
 package com.jay.habit_tracker.controller;
 
-import com.jay.habit_tracker.dto.tag.HabitTagAddRequest;
+import com.jay.habit_tracker.dto.tag.TagAddRequest;
+import com.jay.habit_tracker.dto.tag.TagDeleteRequest;
 import com.jay.habit_tracker.dto.tag.TagDto;
 import com.jay.habit_tracker.service.TagService;
 import com.jay.habit_tracker.util.JwtUtil;
@@ -22,7 +23,7 @@ public class TagController {
     @PostMapping("/add-habit-tag/{userId}")
     public ResponseEntity<?> addHabitTag(
             @PathVariable Long userId,
-            @RequestBody HabitTagAddRequest tagRequest,
+            @RequestBody TagAddRequest tagRequest,
             HttpServletRequest request
     ) {
         Long tokenUserId = jwtUtil.extractUserId(request);
@@ -37,5 +38,25 @@ public class TagController {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/remove-habit-tag/{userId}")
+    public ResponseEntity<?> removeHabitTag(
+            @PathVariable Long userId,
+            @RequestBody TagDeleteRequest tagRequest,
+            HttpServletRequest request
+    ) {
+        Long tokenUserId = jwtUtil.extractUserId(request);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+
+        try {
+            tagService.removeHabitTag(tagRequest.getHabitId(), tagRequest.getTagId());
+            return ResponseEntity.ok(Map.of("message", "Tag removed from habit"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
+        }
+    }
+
 
 }
