@@ -36,18 +36,28 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(AuthRequest request) {
-        User user = (User) entityManager
-                .createNativeQuery("SELECT * FROM users WHERE email = :email", User.class)
+        Object[] row = (Object[]) entityManager
+                .createNativeQuery("SELECT id, password FROM users WHERE email = :email")
                 .setParameter("email", request.getEmail())
                 .getResultStream()
                 .findFirst()
                 .orElse(null);
 
-        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (row == null) {
             throw new RuntimeException("Invalid email or password");
         }
+        String hashedPassword = (String) row[1];
+
+        if (!passwordEncoder.matches(request.getPassword(), hashedPassword)) {
+            throw new RuntimeException("Invalid email or password");
+        }
+        User user = User.builder()
+                .id((Long) row[0])
+                .email(request.getEmail())
+                .build();
 
         return jwtUtil.generateToken(user);
     }
+
 
 }

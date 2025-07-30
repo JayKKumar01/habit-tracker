@@ -179,12 +179,13 @@ public class HabitServiceImpl implements HabitService {
 
     @Override
     public boolean deleteHabit(Long habitId) {
-        return habitRepository.findById(habitId)
-                .map(habit -> {
-                    habitRepository.delete(habit);
-                    return true;
-                })
-                .orElse(false);
+        Habit habitRef = entityManager.getReference(Habit.class,habitId);
+        try {
+            habitRepository.delete(habitRef);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
 

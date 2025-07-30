@@ -20,15 +20,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserByEmail(String email) {
-        User user = (User) entityManager
-                .createNativeQuery("SELECT * FROM users WHERE email = :email", User.class)
+        Object[] row = (Object[]) entityManager
+                .createNativeQuery("SELECT id, name, email, created_at FROM users WHERE email = :email")
                 .setParameter("email", email)
                 .getResultStream()
                 .findFirst()
                 .orElse(null);
 
-        return user != null ? userMapper.toDto(user) : null;
+        if (row == null) return null;
+
+        return UserResponse.builder()
+                .id(((Number) row[0]).longValue())
+                .name((String) row[1])
+                .email((String) row[2])
+                .createdAt(((java.sql.Timestamp) row[3]).toInstant())
+                .build();
     }
+
 
 
 }
