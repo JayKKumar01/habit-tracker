@@ -7,8 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitTagDto {
-    private Long id;
-    private String name;
+public class HabitTagAddRequest {
     private Long habitId;
+    private String name;
 }

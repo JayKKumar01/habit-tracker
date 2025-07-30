@@ -2,14 +2,13 @@ package com.jay.habit_tracker.service;
 
 import com.jay.habit_tracker.dto.habit.*;
 import com.jay.habit_tracker.dto.habit_log.HabitLogDto;
-import com.jay.habit_tracker.dto.tag.HabitTagDto;
+import com.jay.habit_tracker.dto.tag.TagDto;
 import com.jay.habit_tracker.entity.Habit;
 import com.jay.habit_tracker.entity.Tag;
 import com.jay.habit_tracker.entity.User;
 import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.mapper.HabitMapper;
 import com.jay.habit_tracker.repository.HabitRepository;
-import com.jay.habit_tracker.repository.HabitTagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ public class HabitServiceImpl implements HabitService {
     private final HabitRepository habitRepository;
     private final HabitMapper habitMapper;
     private final EntityManager entityManager;
-    private final HabitTagRepository habitTagRepository;
 
     @Override
     @Transactional
@@ -137,12 +135,11 @@ public class HabitServiceImpl implements HabitService {
                     String[] tagIds = ((String) tagIdObj).split(",");
                     String[] tagNames = ((String) tagNameObj).split(",");
 
-                    List<HabitTagDto> tagDtos = new ArrayList<>(tagIds.length);
+                    List<TagDto> tagDtos = new ArrayList<>(tagIds.length);
                     for (int i = 0; i < tagIds.length; i++) {
-                        tagDtos.add(HabitTagDto.builder()
+                        tagDtos.add(TagDto.builder()
                                 .id(Long.parseLong(tagIds[i].trim()))
                                 .name(tagNames[i].trim())
-                                .habitId(habitId)
                                 .build());
                     }
 
@@ -170,7 +167,7 @@ public class HabitServiceImpl implements HabitService {
                 ((ArrayList<?>) logs).trimToSize();
             }
 
-            List<HabitTagDto> tags = habit.getTags();
+            List<TagDto> tags = habit.getTags();
             if (tags instanceof ArrayList<?>) {
                 ((ArrayList<?>) tags).trimToSize();
             }

@@ -1,6 +1,6 @@
 package com.jay.habit_tracker.dto.habit;
 
-import com.jay.habit_tracker.dto.tag.HabitTagResponse;
+import com.jay.habit_tracker.dto.tag.TagDto;
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
 
@@ -20,5 +20,5 @@ public class HabitResponse {
     private Frequency frequency;
     private Set<DayOfWeek> targetDays; // e.g., ["MONDAY", "WEDNESDAY"]
     private LocalDate startDate;
-    private Set<HabitTagResponse> tags;
+    private Set<TagDto> tags;
 }

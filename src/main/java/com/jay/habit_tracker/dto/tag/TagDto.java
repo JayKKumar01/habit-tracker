@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitTagResponse {
+public class TagDto {
     private Long id;
     private String name;
 }

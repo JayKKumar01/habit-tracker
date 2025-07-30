@@ -1,7 +1,7 @@
 package com.jay.habit_tracker.dto.habit;
 
 import com.jay.habit_tracker.dto.habit_log.HabitLogDto;
-import com.jay.habit_tracker.dto.tag.HabitTagDto;
+import com.jay.habit_tracker.dto.tag.TagDto;
 import com.jay.habit_tracker.enums.Frequency;
 import lombok.*;
 
@@ -26,5 +26,5 @@ public class HabitEntitiesResponse {
     
     // ✅ List of associated log entries
     private List<HabitLogDto> logs;
-    private List<HabitTagDto> tags;
+    private List<TagDto> tags;
 }

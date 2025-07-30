@@ -1,12 +1,12 @@
 package com.jay.habit_tracker.controller;
 import com.jay.habit_tracker.dto.habit.HabitRequest;
 import com.jay.habit_tracker.dto.habit.HabitResponse;
-import com.jay.habit_tracker.dto.tag.HabitTagDto;
+import com.jay.habit_tracker.dto.tag.TagDto;
 import com.jay.habit_tracker.entity.*;
 import com.jay.habit_tracker.enums.Frequency;
 import com.jay.habit_tracker.repository.*;
 import com.jay.habit_tracker.service.HabitService;
-import com.jay.habit_tracker.service.HabitTagService;
+import com.jay.habit_tracker.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,10 +25,10 @@ public class MasterController {
     private final HabitRepository habitRepository;
     private final HabitLogRepository habitLogRepository;
     private final ProfileRepository profileRepository;
-    private final HabitTagRepository habitTagRepository;
+    private final TagRepository tagRepository;
     private final PasswordEncoder passwordEncoder;
     private final HabitService habitService;
-    private final HabitTagService habitTagService;
+    private final TagService tagService;
 
     @DeleteMapping("/delete-users-except")
     public ResponseEntity<String> deleteAllUsersExcept(@RequestBody List<String> emailsToKeep) {
@@ -44,9 +44,9 @@ public class MasterController {
     @Transactional
     public ResponseEntity<String> mapTagsToHabitsByFrequency() {
         // Step 1: Fetch required tags by ID
-        Tag dailyTag = habitTagRepository.findById(1L).orElseThrow(() ->
+        Tag dailyTag = tagRepository.findById(1L).orElseThrow(() ->
                 new RuntimeException("Tag with ID 1 (DAILY) not found"));
-        Tag weeklyTag = habitTagRepository.findById(3L).orElseThrow(() ->
+        Tag weeklyTag = tagRepository.findById(3L).orElseThrow(() ->
                 new RuntimeException("Tag with ID 3 (WEEKLY) not found"));
 
         // Step 2: Fetch habits by frequency
@@ -74,7 +74,7 @@ public class MasterController {
     @DeleteMapping("/delete-tags-except")
     @Transactional
     public ResponseEntity<String> deleteTagsExcept(@RequestBody List<Long> idsToKeep) {
-        List<Tag> tagsToDelete = habitTagRepository.findByIdNotIn(idsToKeep);
+        List<Tag> tagsToDelete = tagRepository.findByIdNotIn(idsToKeep);
 
         for (Tag tag : tagsToDelete) {
             // Unlink tag from all associated habits
@@ -84,7 +84,7 @@ public class MasterController {
             tag.getHabits().clear(); // Optional: make sure all links are broken
         }
 
-        habitTagRepository.deleteAll(tagsToDelete);
+        tagRepository.deleteAll(tagsToDelete);
         return ResponseEntity.ok("Deleted " + tagsToDelete.size() + " tags successfully.");
     }
 
@@ -103,8 +103,8 @@ public class MasterController {
         for (String tagName : defaultTagNames) {
             String normalizedTag = tagName.trim().toLowerCase();
 
-            Tag tag = habitTagRepository.findByName(normalizedTag)
-                    .orElseGet(() -> habitTagRepository.save(
+            Tag tag = tagRepository.findByName(normalizedTag)
+                    .orElseGet(() -> tagRepository.save(
                             Tag.builder().name(normalizedTag).build()
                     ));
 
@@ -120,7 +120,7 @@ public class MasterController {
             @PathVariable Long habitId,
             @RequestParam String tagName) {
 
-        HabitTagDto habitTag = habitTagService.addTagToHabit(habitId, tagName);
+        TagDto habitTag = tagService.addHabitTag(habitId, tagName);
 
         if (habitTag == null) {
             return ResponseEntity
@@ -240,7 +240,7 @@ public class MasterController {
 
         // Habit Tags
         html.append("<h2>Habit Tags</h2><table border='1'><tr><th>Tag ID</th><th>Name</th><th>Habit ID</th></tr>");
-        habitTagRepository.getAllProjectedTags().forEach(tag -> html.append("<tr>")
+        tagRepository.getAllProjectedTags().forEach(tag -> html.append("<tr>")
                 .append("<td>").append(tag.getId()).append("</td>")
                 .append("<td>").append(htmlEscape(tag.getName())).append("</td>")
                 .append("<td>").append(tag.getHabitId()).append("</td>")
