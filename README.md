@@ -155,3 +155,119 @@ private Set<Habit> habits = new HashSet<>();
 | HabitLog | Habit        | Habit         | Many-to-One  | `@ManyToOne`    |
 
 ---
+
+## 🔌 REST API Endpoints
+
+### 1. Authentication (`AuthController`)
+
+Manages user registration and login, issuing JWT tokens for secure authentication.
+
+| HTTP Method | Endpoint           | Description                                     |
+| ----------- | ------------------ | ----------------------------------------------- |
+| POST        | `/api/auth/signup` | Register a new user (`signup`)                  |
+| POST        | `/api/auth/login`  | Authenticate user and issue JWT token (`login`) |
+
+```java
+@PostMapping("/signup")
+public ResponseEntity<?> signup(@RequestBody UserRegistration dto)
+
+@PostMapping("/login")
+public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request)
+```
+
+---
+
+### 2. User Management (`UserController`)
+
+Provides secure access to user details, such as fetching user information by email.
+
+| HTTP Method | Endpoint     | Description                                       |
+| ----------- | ------------ | ------------------------------------------------- |
+| GET         | `/api/users` | Retrieve user details by email (`getUserByEmail`) |
+
+```java
+@GetMapping
+public ResponseEntity<?> getUserByEmail(@RequestParam String email, HttpServletRequest request)
+```
+
+---
+
+### 3. Profile Management (`ProfileController`)
+
+Handles creation, updating, and retrieval of user profile data with proper authorization.
+
+| HTTP Method | Endpoint                     | Description                                           |
+| ----------- | ---------------------------- | ----------------------------------------------------- |
+| POST        | `/api/profile/save/{userId}` | Create or update user profile (`saveOrUpdateProfile`) |
+| GET         | `/api/profile/user/{userId}` | Retrieve profile details by user ID (`getProfile`)    |
+
+```java
+@PostMapping("/save/{userId}")
+public ResponseEntity<?> saveOrUpdateProfile(@PathVariable Long userId, @RequestBody ProfileRequest profileRequest, HttpServletRequest request)
+
+@GetMapping("/user/{userId}")
+public ResponseEntity<?> getProfile(@PathVariable Long userId, HttpServletRequest request)
+```
+
+---
+
+### 4. Habit Management (`HabitController`)
+
+Enables users to create, update, view, and delete habits, ensuring access control.
+
+| HTTP Method | Endpoint                                | Description                                          |
+| ----------- | --------------------------------------- | ---------------------------------------------------- |
+| POST        | `/api/habits/create/{userId}`           | Create a new habit (`createHabit`)                   |
+| PUT         | `/api/habits/edit/{userId}`             | Update existing habit (`updateHabit`)                |
+| GET         | `/api/habits/habits/{userId}`           | Retrieve all habits for a user (`getHabitsByUserId`) |
+| DELETE      | `/api/habits/delete/{userId}/{habitId}` | Delete a habit (`deleteHabit`)                       |
+
+```java
+@PostMapping("/create/{userId}")
+public ResponseEntity<?> createHabit(@PathVariable Long userId, @RequestBody HabitRequest requestDTO, HttpServletRequest request)
+
+@PutMapping("/edit/{userId}")
+public ResponseEntity<?> updateHabit(@PathVariable Long userId, @RequestBody HabitUpdate editRequest, HttpServletRequest request)
+
+@GetMapping("/habits/{userId}")
+public ResponseEntity<?> getHabitsByUserId(@PathVariable Long userId, HttpServletRequest request)
+
+@DeleteMapping("/delete/{userId}/{habitId}")
+public ResponseEntity<?> deleteHabit(@PathVariable Long userId, @PathVariable Long habitId, HttpServletRequest request)
+```
+
+---
+
+### 5. Habit Log Management (`HabitLogController`)
+
+Supports secure updates to habit progress logs.
+
+| HTTP Method | Endpoint                         | Description                           |
+| ----------- | -------------------------------- | ------------------------------------- |
+| POST        | `/api/habit-log/update/{userId}` | Update a habit log (`updateHabitLog`) |
+
+```java
+@PostMapping("/update/{userId}")
+public ResponseEntity<?> updateHabitLog(@PathVariable Long userId, @RequestBody HabitLogDto habitLogDto, HttpServletRequest request)
+```
+
+---
+
+### 6. Tag Management (`TagController`)
+
+Provides endpoints to manage tags associated with habits, with enforced authorization.
+
+| HTTP Method | Endpoint                              | Description                                  |
+| ----------- | ------------------------------------- | -------------------------------------------- |
+| POST        | `/api/tags/add-habit-tag/{userId}`    | Add a tag to a habit (`addHabitTag`)         |
+| POST        | `/api/tags/remove-habit-tag/{userId}` | Remove a tag from a habit (`removeHabitTag`) |
+
+```java
+@PostMapping("/add-habit-tag/{userId}")
+public ResponseEntity<?> addHabitTag(@PathVariable Long userId, @RequestBody TagAddRequest tagRequest, HttpServletRequest request)
+
+@PostMapping("/remove-habit-tag/{userId}")
+public ResponseEntity<?> removeHabitTag(@PathVariable Long userId, @RequestBody TagDeleteRequest tagRequest, HttpServletRequest request)
+```
+
+---
