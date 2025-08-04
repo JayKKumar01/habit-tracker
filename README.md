@@ -379,4 +379,70 @@ INSERT INTO habit_tag_mapping (...) SELECT ... WHERE NOT EXISTS (...)
 ```
 
 ---
+## 📦 Technologies Used
 
+* **Backend**: Java 17, Spring Boot, Spring Web, Spring Data JPA, Spring Security
+* **Database**: MySQL
+* **Authentication**: JWT (JSON Web Token)
+* **Build Tool**: Maven
+* **Other Tools**: Lombok, JPA Native Queries via EntityManager
+
+---
+
+## 🚀 Deployment
+
+You can run the project locally using:
+
+```bash
+mvn spring-boot:run
+```
+
+Or build the JAR:
+
+```bash
+mvn clean install
+java -jar target/habit-tracker.jar
+```
+
+---
+
+## 🔒 Security
+
+All endpoints (except `/auth/signup` and `/auth/login`) are secured using JWT tokens.
+Tokens must be included in the `Authorization` header as:
+
+```
+Authorization: Bearer <your_token_here>
+```
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── controller        # REST API controllers
+├── dto              # Request and response models
+├── entity           # JPA entity models
+├── mapper           # DTO to Entity converters
+├── repository       # Spring Data JPA repositories
+├── service          # Business logic and DB interaction
+└── util             # JWT utilities and helpers
+```
+
+---
+
+## 🧠 Design Philosophy
+
+* **Efficient Native SQL**: Leveraging `EntityManager` with native queries avoids unnecessary lazy loading and ORM overhead.
+* **Modular Codebase**: Clear separation of concerns across controller, service, and persistence layers.
+* **Clean DTO Mapping**: Keeps domain logic decoupled from data representation.
+
+---
+
+## 🙌 Acknowledgments
+
+This project was developed with performance, simplicity, and extensibility in mind.
+Special thanks to open-source libraries and the Spring community.
+
+---
