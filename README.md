@@ -271,3 +271,112 @@ public ResponseEntity<?> removeHabitTag(@PathVariable Long userId, @RequestBody 
 ```
 
 ---
+## ⚙️ Service Layer Overview
+
+The service layer encapsulates the core business logic and database interaction. To ensure optimal performance, it combines Spring Data JPA with **native SQL queries** through `EntityManager` for critical operations like authentication, data retrieval, and efficient inserts/updates.
+
+---
+
+### 1. 🔐 Auth Service (`AuthServiceImpl`)
+
+Handles secure user registration and login via native SQL for performance-critical paths.
+
+**Responsibilities:**
+
+* Register users with encrypted passwords.
+* Authenticate users using email and hashed password.
+* Generate JWT tokens on successful login.
+
+```java
+// Native SQL for login authentication
+SELECT id, password FROM users WHERE email = :email
+```
+
+---
+
+### 2. 👤 User Service (`UserServiceImpl`)
+
+Retrieves user data quickly using lightweight SQL projections instead of full entity loading.
+
+**Responsibilities:**
+
+* Fetch user details by email using selected fields only.
+
+```java
+// SQL projection for efficient user retrieval
+SELECT id, name, email, created_at FROM users WHERE email = :email
+```
+
+---
+
+### 3. 🧾 Profile Service (`ProfileServiceImpl`)
+
+Supports user profile creation and updates using `UPSERT` operations and JPQL fetch.
+
+**Responsibilities:**
+
+* Create or update bio and name using upsert pattern.
+* Fetch user profile via JPQL.
+
+```java
+// Upsert user profile
+INSERT INTO profiles (...) ON DUPLICATE KEY UPDATE ...
+
+// Update user name
+UPDATE users SET name = :name WHERE id = :userId
+```
+
+---
+
+### 4. 📋 Habit Service (`HabitServiceImpl`)
+
+Implements optimized logic for habit creation, updates, and aggregated fetching.
+
+**Responsibilities:**
+
+* Create habits and auto-assign default tags (like DAILY).
+* Update habits with flexible SQL.
+* Retrieve habits + logs + tags in a single optimized query.
+
+```java
+// Dynamic habit update logic
+UPDATE habits SET title = ..., description = ... WHERE id = :habitId
+
+// Fetch all habits, logs, and tags efficiently
+SELECT h.id, h.title, ..., ht.name FROM habits h LEFT JOIN ...
+```
+
+---
+
+### 5. 📈 Habit Log Service (`HabitLogServiceImpl`)
+
+Performs idempotent logging of habit progress using upsert operations.
+
+**Responsibilities:**
+
+* Insert or update habit logs for a given day.
+
+```java
+// Insert or update if log already exists
+INSERT INTO habit_logs (...) VALUES (...) ON DUPLICATE KEY UPDATE ...
+```
+
+---
+
+### 6. 🏷️ Tag Service (`TagServiceImpl`)
+
+Manages tagging logic for habits, ensuring uniqueness and avoiding duplication.
+
+**Responsibilities:**
+
+* Add new tags or reuse existing ones.
+* Link tags to habits only if not already mapped.
+* Remove habit-tag associations.
+
+```java
+// Insert tag mapping only if not already linked
+INSERT INTO habit_tag_mapping (...) SELECT ... WHERE NOT EXISTS (...)
+```
+
+---
+
