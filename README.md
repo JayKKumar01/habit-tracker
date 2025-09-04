@@ -3,7 +3,7 @@
 ## 🚀 Live Demo
 
 Explore the live application here:
-🔗 **[http://jaykkumar01-habit-tracker.s3-website.eu-north-1.amazonaws.com/](http://jaykkumar01-habit-tracker.s3-website.eu-north-1.amazonaws.com/)**
+🔗 **[http://habit-tracker-frontend-01.s3-website.ap-south-1.amazonaws.com/](http://habit-tracker-frontend-01.s3-website.ap-south-1.amazonaws.com/)**
 
 ## 📁 Frontend Repository
 
