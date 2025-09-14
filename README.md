@@ -119,7 +119,6 @@ npm start
   ├── styles/
   └── App.js
 =======
-🔗 **[https://jaykkumar01.github.io/habit-tracker](https://jaykkumar01.github.io/habit-tracker)**
 
 
 
