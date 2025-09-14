@@ -1,0 +1,108 @@
+.input-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.input-modal-content {
+    background: white;
+    padding: 24px 32px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+}
+
+.input-modal-message {
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.input-modal-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.input-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.input-confirm-btn,
+.input-cancel-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.input-confirm-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.input-cancel-btn {
+    background-color: #ecf0f1;
+    color: #333;
+}
+
+.input-confirm-btn:hover {
+    background-color: #2980b9;
+}
+
+.input-cancel-btn:hover {
+    background-color: #d0d3d4;
+}
+
+.input-modal-error {
+    color: red;
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+.input-modal-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 0;
+    justify-content: center;
+}
+
+.input-suggestion-btn {
+    padding: 5px 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.input-suggestion-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.input-suggestion-btn.selected {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+    font-weight: 600;
+}

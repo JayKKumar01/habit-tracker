@@ -1,0 +1,181 @@
+/* ======================
+   Dashboard Wrapper
+   ====================== */
+.dashboard-wrapper {
+    max-width: 1200px;
+    margin: 40px auto; /* ✅ centers it horizontally */
+    margin-left: 5%;   /* ✅ add left margin */
+    margin-right: 5%;  /* ✅ add right margin */
+    padding: 40px;     /* keep inner padding same */
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 80px);
+    box-sizing: border-box;
+}
+
+/* ======================
+   Rows
+   ====================== */
+.dashboard-title-row,
+.dashboard-week-add-row,
+.dashboard-row,
+.dashboard-welcome-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dashboard-title-row {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background: #f0f4ff;
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid #d0dfff;
+    box-shadow: 0 4px 12px rgba(63, 81, 181, 0.05);
+}
+
+.dashboard-welcome-row {
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.dashboard-week-add-row {
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.dashboard-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+    align-items: stretch;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Equal width columns for profile & task list */
+.user-info-container,
+.today-task-list-container {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ======================
+   Typography
+   ====================== */
+.app-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #3f51b5;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.logout-btn {
+    font-size: 14px;
+    color: #3f51b5;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: auto;
+}
+
+.welcome-text {
+    font-size: 26px;
+    color: #ff9800;
+    margin: 0;
+}
+
+.dashboard-week-add-row > * {
+    margin: 0;
+}
+
+/* Habit Overview & Weekly Progress */
+.habit-overview-section,
+.weekly-progress-section {
+    width: 100%;
+}
+.habit-overview-section { margin-top: 40px; }
+.weekly-progress-section { margin-top: 30px; }
+
+/* ======================
+   Full Screen Loader
+   ====================== */
+.full-screen-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ccc;
+    border-top-color: #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ======================
+   User Icon Button (Mobile)
+   ====================== */
+.user-icon-btn {
+    display: none;
+    background: none;
+    border: 2px solid transparent;
+    cursor: pointer;
+    margin-left: 12px;
+    padding: 6px;
+    color: #3f51b5;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.user-icon-btn:hover { background-color: rgba(63, 81, 181, 0.1); }
+.user-icon-btn.active { border-color: #3f51b5; }
+
+/* ======================
+   Mobile Responsiveness
+   ====================== */
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        margin-left: 12px;  /* ✅ small margin on left */
+        margin-right: 12px; /* ✅ small margin on right */
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 20px; /* keep padding for inner spacing */
+    }
+
+    .app-title { font-size: 22px; }
+    .logout-btn { font-size: 13px; }
+
+    .welcome-text { font-size: 18px; text-align: left; }
+
+    .dashboard-week-add-row { gap: 10px; margin-bottom: 20px; }
+    .dashboard-week-add-row > * { font-size: 16px; }
+
+    .dashboard-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .habit-overview-section,
+    .weekly-progress-section { margin-top: 20px; }
+
+    .user-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .user-info-container { display: none; width: 100%; margin-top: 12px; }
+    .user-info-container.show { display: block; }
+}

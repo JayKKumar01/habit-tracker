@@ -1,0 +1,118 @@
+.todays-task-card {
+    background-color: #fff4e5;
+    padding: 24px;
+    border-left: 6px solid #ff9800;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    flex: 1;
+    max-width: 500px;
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.todays-task-card h2 {
+    margin: 0;
+    color: #e65100;
+    font-size: 20px;
+}
+
+.task-list-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-top: 12px;
+}
+
+/* Scrollbar styling */
+.task-list-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+.task-list-wrapper::-webkit-scrollbar-thumb {
+    background-color: #ff9800;
+    border-radius: 4px;
+}
+.task-list-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.task-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    line-height: 1.4;
+}
+
+.task-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    accent-color: #4caf50;
+    cursor: default;
+}
+
+.task-title {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ✅ Status styles */
+.task.done .task-title {
+    color: #4caf50;
+    font-weight: bold;
+    text-decoration: line-through;
+}
+
+.task.pending .task-title {
+    color: #f44336;
+    font-weight: 500;
+}
+
+/* Empty state */
+.empty-task-placeholder {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.no-habit-text {
+    font-size: 16px;
+    color: #8a6d3b;
+    margin-bottom: 16px;
+}
+
+.add-habit-btn-today {
+    background-color: #ff9800;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-habit-btn-today:hover {
+    background-color: #e68900;
+}

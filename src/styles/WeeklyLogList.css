@@ -1,0 +1,11 @@
+.weekly-progress-section {
+    margin-top: 40px;
+    width: 100%;
+}
+/* In Dashboard.css */
+.weekly-logs-section {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

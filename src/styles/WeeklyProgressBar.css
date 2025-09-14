@@ -1,0 +1,50 @@
+.weekly-progress-wrapper {
+    background-color: #f9f9f9;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    max-height: 250px;
+    overflow: auto;
+
+    /* Scrollbar styles */
+    scrollbar-width: thin;              /* For Firefox */
+    scrollbar-color: #ccc transparent;  /* For Firefox */
+}
+
+/* WebKit scrollbar styling */
+.weekly-progress-wrapper::-webkit-scrollbar {
+    width: 6px;              /* Thin scrollbar */
+}
+
+.weekly-progress-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.weekly-progress-wrapper::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+
+/* Optional hover effect */
+.weekly-progress-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #999;
+}
+
+.weekly-progress-wrapper h2 {
+    margin-top: 0;
+    color: #2e7d32;
+    margin-bottom: 20px;
+}
+
+.progress-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.weekly-progress-wrapper p {
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    margin-top: 20px;
+}

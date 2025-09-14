@@ -1,0 +1,73 @@
+.tags-section {
+    margin-top: 12px;
+}
+
+.tags-label {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #0d47a1;
+}
+
+.habit-tags-scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -ms-overflow-style: none;
+}
+
+.habit-tags-scroll::-webkit-scrollbar {
+    height: 2px;
+}
+
+.habit-tags-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 1px;
+}
+
+.habit-tags-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 4px;
+    max-width: 100%;
+}
+
+.habit-tag {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #0d47a1;
+    background-color: rgba(25, 118, 210, 0.08);
+    border: 1px solid #1976d2;
+    border-radius: 6px;
+    white-space: nowrap;
+    text-transform: lowercase;
+    cursor: pointer;
+}
+
+.tags-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tag-action-btn {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    color: #0d47a1;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.tag-action-btn:hover {
+    background-color: rgba(25, 118, 210, 0.1);
+}
+
+.habit-tag.selected {
+    background-color: rgba(244, 67, 54, 0.1);
+    border-color: #f44336;
+    color: #b71c1c;
+}

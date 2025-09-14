@@ -1,0 +1,141 @@
+/* EditProfileForm.css */
+
+.edit-profile-form {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 0 12px; /* ✅ Adds left-right space for small screens */
+    box-sizing: border-box;
+}
+
+.edit-profile-form form {
+    background-color: #fefeff;
+    padding: 24px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border: 2px solid #cce0ff;
+    animation: slideIn 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.edit-profile-form h2 {
+    font-size: 22px;
+    color: #265cc5;
+    margin-bottom: 18px;
+    width: 100%;
+    text-align: center;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    border-color: #5588ff;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-error {
+    color: #d60000;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.form-actions button {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #4a86ff;
+    color: white;
+}
+
+.form-actions button[type="submit"]:hover {
+    background-color: #3a70e0;
+}
+
+.form-actions button[type="button"] {
+    background-color: #ddd;
+    color: #333;
+}
+
+.form-actions button[type="button"]:hover {
+    background-color: #ccc;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ✅ Mobile-specific fine-tuning */
+@media (max-width: 480px) {
+    .edit-profile-form {
+        padding: 0 16px; /* slightly bigger padding for extra breathing room */
+    }
+
+    .edit-profile-form form {
+        padding: 18px;
+    }
+
+    .edit-profile-form h2 {
+        font-size: 20px;
+    }
+}
