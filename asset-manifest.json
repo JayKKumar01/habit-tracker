@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/habit-tracker/static/css/main.c72eaf43.css",
-    "main.js": "/habit-tracker/static/js/main.84eb8d69.js",
-    "static/js/453.48a63118.chunk.js": "/habit-tracker/static/js/453.48a63118.chunk.js",
-    "index.html": "/habit-tracker/index.html",
-    "main.c72eaf43.css.map": "/habit-tracker/static/css/main.c72eaf43.css.map",
-    "main.84eb8d69.js.map": "/habit-tracker/static/js/main.84eb8d69.js.map",
-    "453.48a63118.chunk.js.map": "/habit-tracker/static/js/453.48a63118.chunk.js.map"
+    "main.css": "/habit-tracker-frontend/static/css/main.c72eaf43.css",
+    "main.js": "/habit-tracker-frontend/static/js/main.d25e3f1f.js",
+    "static/js/453.48a63118.chunk.js": "/habit-tracker-frontend/static/js/453.48a63118.chunk.js",
+    "index.html": "/habit-tracker-frontend/index.html",
+    "main.c72eaf43.css.map": "/habit-tracker-frontend/static/css/main.c72eaf43.css.map",
+    "main.d25e3f1f.js.map": "/habit-tracker-frontend/static/js/main.d25e3f1f.js.map",
+    "453.48a63118.chunk.js.map": "/habit-tracker-frontend/static/js/453.48a63118.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c72eaf43.css",
-    "static/js/main.84eb8d69.js"
+    "static/js/main.d25e3f1f.js"
   ]
 }
