@@ -5,4 +5,4 @@ export default BASE_URL;
 
 // Set the base path for GitHub Pages
 export const BASENAME =
-    process.env.NODE_ENV === "production" ? "/habit-tracker" : "/";
+    process.env.NODE_ENV === "production" ? "/habit-tracker-frontend" : "/";
